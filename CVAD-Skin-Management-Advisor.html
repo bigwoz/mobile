@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CVAD Skin Management Advisor</title>
+<style>
+:root{
+  --navy:#0D2D5E; --navy-mid:#164080; --blue:#1A6FAF; --blue-lt:#E5F0FA;
+  --bg:#EEF2F7; --surface:#FFFFFF;
+  --amber:#C97A00; --amber-bg:#FFFBEB; --amber-bd:#FDE68A;
+  --red:#C91B1B; --red-bg:#FEF2F2; --red-bd:#FEB4B4;
+  --green:#14803D; --green-bg:#F0FDF4; --green-bd:#A7F3C3;
+  --purple:#6D4FC2; --purple-bg:#F3F0FE; --purple-bd:#DCD3FB;
+  --muted:#6B7280; --border:#DDE3EC; --text:#1B2333; --r:13px; --r-sm:8px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  padding-bottom:92px;
+}
+/* header */
+header{position:sticky; top:0; z-index:50; background:var(--navy); color:#fff; padding:14px 16px 12px;}
+.eyebrow{font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#AFC4E6; display:flex; align-items:center; justify-content:space-between;}
+.badge-pill{background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.25); padding:2px 9px; border-radius:99px; font-size:9px; letter-spacing:.06em;}
+.app-name{font-size:19px; font-weight:800; margin-top:4px;}
+.app-sub{font-size:12px; color:#C7D6EE; margin-top:2px;}
+.progress-wrap{margin-top:12px;}
+.progress-track{height:5px; background:rgba(255,255,255,.18); border-radius:99px; overflow:hidden;}
+.progress-fill{height:100%; background:linear-gradient(90deg,#4C8FD6,#8FC1F0); border-radius:99px; transition:width .3s ease;}
+.progress-label{font-size:10.5px; color:#9FB6DE; margin-top:5px; display:flex; justify-content:space-between;}
+
+main{padding:14px; max-width:640px; margin:0 auto;}
+.screen{display:none; animation:fadein .25s ease;}
+.screen.active{display:block;}
+@keyframes fadein{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+
+.card{background:var(--surface); border-radius:var(--r); box-shadow:0 1px 3px rgba(0,0,0,.06); border:1px solid var(--border); margin-bottom:14px; overflow:hidden;}
+.card-head{display:flex; align-items:center; gap:11px; padding:14px 15px;}
+.icon-circ{width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0;}
+.si-b{background:#DBEAFE;} .si-a{background:#FEF3C7;} .si-g{background:#DCFCE7;} .si-r{background:#FEE2E2;} .si-p{background:#EDE9FE;} .si-n{background:#E0ECF8;}
+.card-title{font-size:15px; font-weight:700;}
+.card-sub{font-size:12px; color:var(--muted); margin-top:1px;}
+.card-body{padding:0 15px 15px;}
+.card-body.pad-top{padding-top:2px;}
+
+h1.hero{font-size:20px; font-weight:800; color:var(--navy); margin:2px 0 6px;}
+p.lead{font-size:13.5px; color:var(--muted); line-height:1.5; margin:0 0 14px;}
+
+.ib{border-left:3px solid; border-radius:11px; padding:11px 13px; font-size:13px; line-height:1.55; margin-bottom:10px;}
+.ib strong{display:block; font-size:11.5px; font-weight:700; margin-bottom:3px; text-transform:uppercase; letter-spacing:.03em;}
+.ib.b{background:var(--blue-lt); border-color:var(--blue); color:#0d3f66;}
+.ib.a{background:var(--amber-bg); border-color:var(--amber); color:#7a4c00;}
+.ib.r{background:var(--red-bg); border-color:var(--red); color:#7a1212;}
+.ib.g{background:var(--green-bg); border-color:var(--green); color:#0d5a2b;}
+.ib.p{background:var(--purple-bg); border-color:var(--purple); color:#3d2c85;}
+
+ul.plain{margin:0; padding-left:18px; font-size:13.5px; line-height:1.6;}
+ul.plain li{margin-bottom:4px;}
+
+.opt-grid{display:flex; flex-direction:column; gap:9px;}
+.opt-card{border:1.5px solid var(--border); border-radius:var(--r-sm); padding:12px 13px; cursor:pointer; transition:.15s; display:flex; gap:11px; align-items:flex-start; background:#fff;}
+.opt-card:active{transform:scale(.98);}
+.opt-card .chk{width:21px; height:21px; border-radius:6px; border:2px solid var(--border); flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center; font-size:13px; color:#fff; transition:.15s;}
+.opt-card.selected{border-color:var(--blue); background:var(--blue-lt);}
+.opt-card.selected .chk{background:var(--blue); border-color:var(--blue);}
+.opt-card .otxt strong{font-size:13.5px; font-weight:700; display:block;}
+.opt-card .otxt span{font-size:12px; color:var(--muted); display:block; margin-top:1px;}
+.opt-card.radio .chk{border-radius:50%;}
+
+.yn-row{display:flex; gap:10px; margin:10px 0 4px;}
+.yn-btn{flex:1; padding:14px; text-align:center; border-radius:var(--r-sm); border:1.5px solid var(--border); font-weight:700; font-size:14px; cursor:pointer; background:#fff; color:var(--muted);}
+.yn-btn.yes.selected{background:var(--green-bg); border-color:var(--green); color:var(--green);}
+.yn-btn.no.selected{background:var(--red-bg); border-color:var(--red); color:var(--red);}
+
+.select-field{width:100%; padding:11px 12px; border-radius:var(--r-sm); border:1.5px solid var(--border); font-size:13.5px; margin-top:6px; background:#fff; color:var(--text); font-family:inherit;}
+.field-label{font-size:12px; font-weight:700; color:var(--navy); margin:14px 0 2px; text-transform:uppercase; letter-spacing:.03em;}
+
+.checklist .citem{display:flex; align-items:flex-start; gap:10px; padding:9px 0; border-bottom:1px dashed var(--border);}
+.checklist .citem:last-child{border-bottom:none;}
+.checklist .cbox{width:22px; height:22px; border-radius:6px; border:2px solid var(--border); flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center; font-size:13px; color:#fff; cursor:pointer;}
+.checklist .cbox.checked{background:var(--green); border-color:var(--green);}
+.checklist .clabel{font-size:13.5px; line-height:1.45; cursor:pointer;}
+
+.accordion .a-head{display:flex; align-items:center; gap:11px; padding:13px 15px; cursor:pointer;}
+.accordion .a-head .chev{margin-left:auto; color:var(--muted); transition:.2s; font-size:12px;}
+.accordion.open .a-head .chev{transform:rotate(180deg);}
+.accordion .a-body{max-height:0; overflow:hidden; transition:max-height .25s ease;}
+.accordion.open .a-body{max-height:1400px;}
+.accordion .a-body-in{padding:0 15px 14px;}
+
+.nav-bar{position:fixed; bottom:0; left:0; right:0; background:var(--navy); padding:10px 14px; display:flex; gap:10px; z-index:60; box-shadow:0 -2px 10px rgba(0,0,0,.15);}
+.nav-bar button{flex:1; border:none; border-radius:var(--r-sm); padding:13px; font-size:14px; font-weight:700; cursor:pointer;}
+.btn-back{background:rgba(255,255,255,.12); color:#fff;}
+.btn-next{background:#fff; color:var(--navy);}
+.btn-next:disabled{opacity:.4;}
+.btn-ref{background:rgba(255,255,255,.12); color:#fff; flex:0 0 44px;}
+
+.modal-bg{position:fixed; inset:0; background:rgba(13,45,94,.5); z-index:100; display:none; align-items:flex-end; justify-content:center;}
+.modal-bg.show{display:flex;}
+.modal{background:#fff; border-radius:16px 16px 0 0; max-height:82vh; overflow-y:auto; width:100%; max-width:640px; padding:16px 0 20px;}
+.modal-head{display:flex; align-items:center; justify-content:space-between; padding:0 16px 12px; border-bottom:1px solid var(--border);}
+.modal-head h3{font-size:15.5px; margin:0; color:var(--navy);}
+.modal-close{border:none; background:var(--bg); width:30px; height:30px; border-radius:50%; font-size:15px; cursor:pointer; color:var(--muted);}
+
+.pill{display:inline-block; padding:3px 9px; border-radius:99px; font-size:10.5px; font-weight:700; margin:0 5px 5px 0;}
+.pill.b{background:var(--blue-lt); color:var(--blue);}
+.pill.a{background:var(--amber-bg); color:var(--amber); border:1px solid var(--amber-bd);}
+.pill.r{background:var(--red-bg); color:var(--red); border:1px solid var(--red-bd);}
+.pill.g{background:var(--green-bg); color:var(--green); border:1px solid var(--green-bd);}
+
+.summary-block{margin-bottom:16px;}
+.summary-block h4{font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--navy); margin:0 0 8px; display:flex; align-items:center; gap:6px;}
+.tag-row{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;}
+
+.btn-outline{width:100%; padding:12px; border-radius:var(--r-sm); border:1.5px solid var(--blue); background:#fff; color:var(--blue); font-weight:700; font-size:13.5px; cursor:pointer; margin-top:6px;}
+.btn-solid{width:100%; padding:13px; border-radius:var(--r-sm); border:none; background:var(--navy); color:#fff; font-weight:700; font-size:14px; cursor:pointer; margin-top:10px;}
+.btn-ghost{width:100%; padding:11px; border-radius:var(--r-sm); border:1.5px dashed var(--border); background:transparent; color:var(--muted); font-weight:600; font-size:13px; cursor:pointer; margin-top:8px;}
+
+.divider-note{font-size:11.5px; color:var(--muted); font-style:italic; margin-top:8px; line-height:1.5;}
+
+@media print{
+  body *{visibility:hidden;}
+  header, .nav-bar, .modal-bg, .print-btn-wrap{display:none !important;}
+  .print-area, .print-area *{visibility:visible;}
+  .print-area{position:absolute; top:0; left:0; width:100%; padding:14px;}
+  .card{box-shadow:none; border:1px solid #ccc;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow"><span>CNSA / eviQ ID-3996 · V3 March 2024</span><span class="badge-pill">ALGORITHM</span></div>
+  <div class="app-name">CVAD Skin Management Advisor</div>
+  <div class="app-sub">Skin & dressing management at the CVAD site</div>
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:4%"></div></div>
+    <div class="progress-label"><span id="progressText">Getting started</span><span id="progressStep"></span></div>
+  </div>
+</header>
+
+<main>
+
+<!-- SCREEN: INTRO -->
+<div class="screen active" data-screen="intro">
+  <h1 class="hero">Standard skin & dressing management</h1>
+  <p class="lead">Work through this tool to assess CVAD site skin changes and get a tailored, evidence-based management summary — based on the CNSA/eviQ Skin Management Algorithm (CASI).</p>
+  <div class="ib b"><strong>Aim</strong>A clean, dry, intact, comfortable, cost-effective dressing that provides catheter or TIVAD needle securement.</div>
+  <div class="card">
+    <div class="card-head"><div class="icon-circ si-n">📋</div><div><div class="card-title">Before you start</div><div class="card-sub">Applies to CICC, tc-CICC, PICC, TIVAD (portacath) & apheresis-CICC</div></div></div>
+    <div class="card-body">
+      <ul class="plain">
+        <li>Assess and document dressing condition at least once per shift, and at every outpatient, clinic or home visit</li>
+        <li>Replace dressing every 7 days, or earlier if it contains ooze/moisture or is not intact</li>
+        <li>Ensure IV lines are secured to the patient to prevent pulling on the dressing</li>
+      </ul>
+      <div class="divider-note">Prompt intervention — do not wait until the next dressing change is due.</div>
+    </div>
+  </div>
+  <button class="btn-outline" onclick="openRef()">📖 Open reference guide (antisepsis, dressings, glossary)</button>
+</div>
+
+<!-- SCREEN: ASSESSMENT -->
+<div class="screen" data-screen="assessment">
+  <div class="card">
+    <div class="card-head"><div class="icon-circ si-b">🩺</div><div><div class="card-title">Complete a holistic patient assessment</div><div class="card-sub">Diagnosis · comorbidities · treatments · allergies · skin conditions · cognition</div></div></div>
+    <div class="card-body">
+      <p style="font-size:13px;color:var(--muted);margin:4px 0 10px;">Consult a vascular access or wound care specialist nurse if required at any point.</p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="icon-circ si-a">⚠️</div><div><div class="card-title">Risk factors for skin impairment</div><div class="card-sub">Select any that apply to this patient</div></div></div>
+    <div class="card-body checklist" id="riskFactorList"></div>
+  </div>
+</div>
+
+<!-- SCREEN: SKIN CHANGE -->
+<div class="screen" data-screen="skinchange">
+  <div class="card">
+    <div class="card-head"><div class="icon-circ si-r">🔍</div><div><div class="card-title">Are skin changes present at the CVAD site?</div><div class="card-sub">Compare against baseline / previous assessment</div></div></div>
+    <div class="card-body">
+      <div class="yn-row">
+        <div class="yn-btn yes" id="sc-yes" onclick="setSkinChange(true)">Yes</div>
+        <div class="yn-btn no" id="sc-no" onclick="setSkinChange(false)">No</div>
+      </div>
+      <div class="divider-note">Skin changes can be categorised as infection, dermatitis or mechanical-injury related, and more than one may be present at once.</div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: CATEGORY SELECT -->
+<div class="screen" data-screen="category">
+  <div class="card">
+    <div class="card-head"><div class="icon-circ si-p">🗂️</div><div><div class="card-title">Which type(s) of skin change are present?</div><div class="card-sub">Select all that apply</div></div></div>
+    <div class="card-body">
+      <div class="opt-grid">
+        <div class="opt-card" id="cat-infection" onclick="toggleCategory('infection')">
+          <div class="chk">✓</div>
+          <div class="otxt"><strong>Local skin infection</strong><span>Red, blanched, mottled, warmth, oedema, pustules, exudate, odour, induration</span></div>
+        </div>
+        <div class="opt-card" id="cat-dermatitis" onclick="toggleCategory('dermatitis')">
+          <div class="chk">✓</div>
+          <div class="otxt"><strong>Contact dermatitis</strong><span>Irritant, allergic or moisture-associated — redness, burning, pain, itch, vesicles</span></div>
+        </div>
+        <div class="opt-card" id="cat-mechanical" onclick="toggleCategory('mechanical')">
+          <div class="chk">✓</div>
+          <div class="otxt"><strong>Mechanical injury</strong><span>Insertion-related bleeding, skin stripping, tears, tension blisters, pressure injury, bruising</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: STANDARD CARE (No branch conclusion) -->
+<div class="screen" data-screen="standardcare">
+  <div class="print-area">
+  <div class="ib g"><strong>✓ Continue with standard care</strong>No skin changes identified — maintain routine CVAD skin & dressing management.</div>
+  <div class="card">
+    <div class="card-head"><div class="icon-circ si-g">✅</div><div><div class="card-title">Standard care checklist</div></div></div>
+    <div class="card-body">
+      <div class="field-label">Skin antisepsis</div>
+      <ul class="plain">
+        <li>2% CHG in 70% IPA swab sticks (e.g. Chloraprep®, 3M™ Soluprep™, Reynard Foam Swab Stick®)</li>
+        <li>Prolonged antisepsis as per local policy — CHG disc (e.g. Biopatch®) or CHG gel dressing (3M™ Tegaderm™ CHG)</li>
+      </ul>
+      <div class="field-label">Securement & dressing</div>
+      <ul class="plain">
+        <li>Use engineered securement devices (ESD) — adhesive or subcutaneous</li>
+        <li>Sterile TSM, ideally next-generation bordered dressing</li>
+        <li>Apply alcohol-free skin barrier film under dressing materials if any risk factors present</li>
+      </ul>
+      <div class="ib r"><strong>Critical practice points</strong>Allow skin to completely air dry before applying any dressing materials. Use low-and-slow, controlled technique for dressing removal while supporting the skin.</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="icon-circ si-n">📌</div><div><div class="card-title">Patient education</div></div></div>
+    <div class="card-body">
+      <ul class="plain">
+        <li>Look at the dressing every day; notify the healthcare team of discomfort, burning, itching, or moisture under the dressing</li>
+        <li>Encourage hydration and a balanced diet for skin health</li>
+        <li>Clip hair under the dressing if required to assist adherence</li>
+      </ul>
+    </div>
+  </div>
+  <div class="summary-block" id="riskSummaryBlock" style="display:none;">
+    <h4>⚠️ Documented risk factors</h4>
+    <div class="tag-row" id="riskSummaryTags"></div>
+  </div>
+  </div>
+  <div class="print-btn-wrap">
+    <button class="btn-outline" onclick="window.print()">🖨️ Print / save summary as PDF</button>
+    <button class="btn-ghost" onclick="restart()">↺ Start new assessment</button>
+  </div>
+</div>
+
+<!-- SIGNS/ASSESS SCREENS (generic containers, content injected) -->
+<div class="screen" data-screen="infection-signs"></div>
+<div class="screen" data-screen="infection-assess"></div>
+<div class="screen" data-screen="dermatitis-signs"></div>
+<div class="screen" data-screen="dermatitis-assess"></div>
+<div class="screen" data-screen="mechanical-signs"></div>
+<div class="screen" data-screen="mechanical-assess"></div>
+
+<!-- SCREEN: SUMMARY -->
+<div class="screen" data-screen="summary">
+  <div class="print-area">
+    <div class="ib r"><strong>⚠ Skin impairment identified — CASI</strong>Follow the tailored management plan below. Consult a vascular access or wound care specialist nurse if required.</div>
+    <div id="summaryContent"></div>
+  </div>
+  <div class="print-btn-wrap">
+    <button class="btn-outline" onclick="window.print()">🖨️ Print / save summary as PDF</button>
+    <button class="btn-ghost" onclick="restart()">↺ Start new assessment</button>
+  </div>
+</div>
+
+</main>
+
+<div class="nav-bar">
+  <button class="btn-back" id="btnBack" onclick="goBack()">Back</button>
+  <button class="btn-ref" onclick="openRef()">📖</button>
+  <button class="btn-next" id="btnNext" onclick="goNext()">Next</button>
+</div>
+
+<!-- REFERENCE MODAL -->
+<div class="modal-bg" id="refModal" onclick="if(event.target===this)closeRef()">
+  <div class="modal">
+    <div class="modal-head"><h3>Reference guide</h3><button class="modal-close" onclick="closeRef()">✕</button></div>
+    <div id="refAccordions"></div>
+  </div>
+</div>
+
+<script>
+/* ---------------- DATA ---------------- */
+const riskFactors = [
+  "Age >50 years, neonates, premature infants",
+  "Comorbidities: infection, diabetes, renal failure, malignancy, skin conditions (e.g. eczema)",
+  "Systemic anti-cancer therapy: metabolites, taxanes, angiogenesis inhibitors, EGFR inhibitors",
+  "Long-term corticosteroids",
+  "Radiation therapy",
+  "Immunosuppression",
+  "Malnutrition & dehydration"
+];
+
+const state = {
+  risks: new Set(),
+  skinChange: null,
+  categories: {infection:false, dermatitis:false, mechanical:false},
+  infection: {neutropenic:null, dressingIntact:null, skinBroken:null, exudate:null},
+  dermatitis: {infiltration:null, areaMatches:null, causes:new Set(), skinBroken:null, severity:null, exudate:null},
+  mechanical: {causes:new Set(), tearEdges:null, pressureCause:null}
+};
+
+/* ---------------- NAV ENGINE ---------------- */
+let baseFlow = ['intro','assessment','skinchange'];
+let queue = [];
+let idx = 0;
+
+function currentScreenList(){ return baseFlow.concat(queue); }
+
+function renderRiskList(){
+  const el = document.getElementById('riskFactorList');
+  el.innerHTML = riskFactors.map((r,i)=>`
+    <div class="citem">
+      <div class="cbox" id="risk-${i}" onclick="toggleRisk(${i})"></div>
+      <div class="clabel" onclick="toggleRisk(${i})">${r}</div>
+    </div>`).join('');
+}
+function toggleRisk(i){
+  const box = document.getElementById('risk-'+i);
+  if(state.risks.has(i)){ state.risks.delete(i); box.classList.remove('checked'); box.textContent=''; }
+  else { state.risks.add(i); box.classList.add('checked'); box.textContent='✓'; }
+}
+
+function setSkinChange(val){
+  state.skinChange = val;
+  document.getElementById('sc-yes').classList.toggle('selected', val===true);
+  document.getElementById('sc-no').classList.toggle('selected', val===false);
+}
+
+function toggleCategory(cat){
+  state.categories[cat] = !state.categories[cat];
+  document.getElementById('cat-'+cat).classList.toggle('selected', state.categories[cat]);
+}
+
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active', s.dataset.screen===name));
+  const list = currentScreenList();
+  const pos = list.indexOf(name);
+  const pct = Math.max(4, Math.round(((pos+1)/list.length)*100));
+  document.getElementById('progressFill').style.width = pct+'%';
+  const labels = {
+    intro:'Getting started', assessment:'Patient assessment', skinchange:'Skin change check',
+    category:'Categorise skin change', standardcare:'Conclusion', summary:'Conclusion',
+    'infection-signs':'Local infection — signs', 'infection-assess':'Local infection — assessment',
+    'dermatitis-signs':'Contact dermatitis — signs', 'dermatitis-assess':'Contact dermatitis — assessment',
+    'mechanical-signs':'Mechanical injury — signs', 'mechanical-assess':'Mechanical injury — assessment'
+  };
+  document.getElementById('progressText').textContent = labels[name] || '';
+  document.getElementById('progressStep').textContent = (pos>=0? (pos+1)+' / '+list.length : '');
+  document.getElementById('btnBack').style.visibility = (name==='intro') ? 'hidden':'visible';
+  const nextBtn = document.getElementById('btnNext');
+  nextBtn.style.display = (name==='standardcare'||name==='summary') ? 'none' : 'flex';
+  window.scrollTo({top:0, behavior:'instant'});
+}
+
+function goNext(){
+  const list = currentScreenList();
+  const name = list[idx];
+
+  // validation / branching per screen
+  if(name==='skinchange'){
+    if(state.skinChange===null){ alert('Please select Yes or No.'); return; }
+    if(state.skinChange===false){
+      buildStandardCareSummary();
+      idx = list.length; // park
+      showScreen('standardcare');
+      return;
+    } else {
+      baseFlow = ['intro','assessment','skinchange','category'];
+      idx = baseFlow.length - 1;
+      showScreen('category');
+      return;
+    }
+  }
+  if(name==='category'){
+    const any = Object.values(state.categories).some(v=>v);
+    if(!any){ alert('Select at least one category of skin change.'); return; }
+    queue = [];
+    if(state.categories.infection) queue.push('infection-signs','infection-assess');
+    if(state.categories.dermatitis) queue.push('dermatitis-signs','dermatitis-assess');
+    if(state.categories.mechanical) queue.push('mechanical-signs','mechanical-assess');
+    queue.push('summary');
+    idx = baseFlow.length; // first of queue
+    renderQueueScreen(queue[0]);
+    showScreen(queue[0]);
+    return;
+  }
+  if(name==='infection-assess' && !validateInfection()) return;
+  if(name==='dermatitis-assess' && !validateDermatitis()) return;
+  if(name==='mechanical-assess' && !validateMechanical()) return;
+
+  idx++;
+  const next = currentScreenList()[idx];
+  if(!next) return;
+  if(next==='summary') buildSummary();
+  renderQueueScreen(next);
+  showScreen(next);
+}
+
+function goBack(){
+  if(idx<=0) return;
+  idx--;
+  const list = currentScreenList();
+  const name = list[idx];
+  if(name==='category'){ baseFlow=['intro','assessment','skinchange']; }
+  renderQueueScreen(name);
+  showScreen(name);
+}
+
+function restart(){
+  state.risks.clear(); state.skinChange=null;
+  state.categories={infection:false,dermatitis:false,mechanical:false};
+  state.infection={neutropenic:null,dressingIntact:null,skinBroken:null,exudate:null};
+  state.dermatitis={infiltration:null,areaMatches:null,causes:new Set(),skinBroken:null,severity:null,exudate:null};
+  state.mechanical={causes:new Set(),tearEdges:null,pressureCause:null};
+  document.querySelectorAll('.opt-card').forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll('.yn-btn').forEach(c=>c.classList.remove('selected'));
+  renderRiskList();
+  baseFlow=['intro','assessment','skinchange']; queue=[]; idx=0;
+  showScreen('intro');
+}
+
+/* ---------------- INFECTION SCREENS ---------------- */
+function renderInfectionSigns(){
+  return `
+  <div class="card">
+    <div class="card-head"><div class="icon-circ si-r">🦠</div><div><div class="card-title">Local skin infection</div><div class="card-sub">Signs & symptoms</div></div></div>
+    <div class="card-body">
+      <ul class="plain"><li>Redness, blanching, mottling, warmth, discomfort</li><li>Oedema, pustules</li><li>Exudate, odour, induration</li></ul>
+      <div class="ib r"><strong>Prompt intervention</strong>Do not wait until the next dressing change is due.</div>
+    </div>
+  </div>`;
+}
+function renderInfectionAssess(){
+  return `
+  <div class="card">
+    <div class="card-head"><div class="icon-circ si-r">📝</div><div><div class="card-title">Assessment</div></div></div>
+    <div class="card-body">
+      <div class="field-label">Is the patient neutropenic?</div>
+      <div class="yn-row"><div class="yn-btn yes" id="inf-neu-yes" onclick="setYN('infection','neutropenic',true)">Yes</div><div class="yn-btn no" id="inf-neu-no" onclick="setYN('infection','neutropenic',false)">No</div></div>
+      <div class="field-label">Is the dressing clean, dry & intact?</div>
+      <div class="yn-row"><div class="yn-btn yes" id="inf-dr-yes" onclick="setYN('infection','dressingIntact',true)">Yes</div><div class="yn-btn no" id="inf-dr-no" onclick="setYN('infection','dressingIntact',false)">No</div></div>
+      <div class="field-label">Is the skin broken?</div>
+      <div class="yn-row"><div class="yn-btn yes" id="inf-sk-yes" onclick="setYN('infection','skinBroken',true)">Yes</div><div class="yn-btn no" id="inf-sk-no" onclick="setYN('infection','skinBroken',false)">No</div></div>
+      <div class="field-label">Amount & type of exudate</div>
+      <select class="select-field" id="inf-exudate" onchange="state.infection.exudate=this.value">
+        <option value="">Select…</option>
+        <option>None</option><option>Small — serous</option><option>Moderate — serous</option>
+        <option>Small — purulent</option><option>Moderate — purulent</option><option>Large — purulent</option>
+        <option>Blood-stained</option>
+      </select>
+    </div>
+  </div>`;
+}
+function validateInfection(){
+  const s = state.infection;
+  if(s.neutropenic===null||s.dressingIntact===null||s.skinBroken===null){ alert('Please answer all questions.'); return false; }
+  return true;
+}
+
+/* ---------------- DERMATITIS SCREENS ---------------- */
+function renderDermatitisSigns(){
+  return `
+  <div class="card">
+    <div class="card-head"><div class="icon-circ si-a">🧴</div><div><div class="card-title">Contact dermatitis</div><div class="card-sub">Irritant, allergic or moisture-associated</div></div></div>
+    <div class="card-body">
+      <ul class="plain"><li>Redness, burning, pain, itch, shiny skin, scales</li><li>Vesicles</li><li>Exudate (blood, serous)</li><li>Maceration (moisture-associated)</li></ul>
+      <div class="ib r"><strong>Prompt intervention</strong>Do not wait until the next dressing change is due.</div>
+    </div>
+  </div>`;
+}
+function renderDermatitisAssess(){
+  return `
+  <div class="card">
+    <div class="card-head"><div class="icon-circ si-a">📝</div><div><div class="card-title">Assessment</div></div></div>
+    <div class="card-body">
+      <div class="field-label">Associated with infiltration or extravasation?</div>
+      <div class="yn-row"><div class="yn-btn yes" id="der-inf-yes" onclick="setYN('dermatitis','infiltration',true)">Yes</div><div class="yn-btn no" id="der-inf-no" onclick="setYN('dermatitis','infiltration',false)">No</div></div>
+      <div class="field-label">Is the affected area the same size/shape as the dressing or adhesive ESD?</div>
+      <div class="yn-row"><div class="yn-btn yes" id="der-area-yes" onclick="setYN('dermatitis','areaMatches',true)">Yes</div><div class="yn-btn no" id="der-area-no" onclick="setYN('dermatitis','areaMatches',false)">No</div></div>
+      <div class="field-label">Is the skin broken?</div>
+      <div class="yn-row"><div class="yn-btn yes" id="der-sk-yes" onclick="setYN('dermatitis','skinBroken',true)">Yes</div><div class="yn-btn no" id="der-sk-no" onclick="setYN('dermatitis','skinBroken',false)">No</div></div>
+      <div class="field-label">Severity</div>
+      <select class="select-field" id="der-sev" onchange="state.dermatitis.severity=this.value">
+        <option value="">Select…</option><option value="mild">Mild</option><option value="severe">Severe</option>
+      </select>
+      <div class="field-label">Amount & type of exudate</div>
+      <select class="select-field" id="der-exudate" onchange="state.dermatitis.exudate=this.value">
+        <option value="">Select…</option><option>None</option><option>Small — serous</option><option>Moderate — serous</option><option>Blood-stained</option><option>High moisture / ooze</option>
+      </select>
+      <div class="field-label">Suspected cause(s) — select all that apply</div>
+      <div class="checklist" id="derCauseList"></div>
+      <div class="divider-note">Potentially more than one irritant — patch test all suspected solutions; use sterile NaCl in the meantime if severe.</div>
+    </div>
+  </div>`;
+}
+const derCauses = ["CHG (chlorhexidine)","IPA (alcohol)","Dressing material / adhesive (ESD)","Other solution"];
+function renderDerCauseList(){
+  const el = document.getElementById('derCauseList');
+  if(!el) return;
+  el.innerHTML = derCauses.map((c,i)=>`
+    <div class="citem"><div class="cbox ${state.dermatitis.causes.has(i)?'checked':''}" id="dc-${i}" onclick="toggleDerCause(${i})">${state.dermatitis.causes.has(i)?'✓':''}</div>
+    <div class="clabel" onclick="toggleDerCause(${i})">${c}</div></div>`).join('');
+}
+function toggleDerCause(i){
+  if(state.dermatitis.causes.has(i)) state.dermatitis.causes.delete(i); else state.dermatitis.causes.add(i);
+  renderDerCauseList();
+}
+function validateDermatitis(){
+  const s = state.dermatitis;
+  if(s.infiltration===null||s.areaMatches===null||s.skinBroken===null||!s.severity){ alert('Please answer all questions.'); return false; }
+  return true;
+}
+
+/* ---------------- MECHANICAL SCREENS ---------------- */
+function renderMechanicalSigns(){
+  return `
+  <div class="card">
+    <div class="card-head"><div class="icon-circ si-p">🩹</div><div><div class="card-title">Mechanical injury</div><div class="card-sub">Signs & symptoms</div></div></div>
+    <div class="card-body">
+      <ul class="plain"><li>Initial skin injury from insertion (bleeding exit site)</li><li>Skin stripping, tears, tension blisters</li><li>Pressure injury, bruising</li></ul>
+    </div>
+  </div>`;
+}
+const mechCauses = ["Insertion-related bleeding","Skin stripping","Skin tear","Tension blister","Pressure injury","Bruising"];
+function renderMechanicalAssess(){
+  return `
+  <div class="card">
+    <div class="card-head"><div class="icon-circ si-p">📝</div><div><div class="card-title">Assessment</div></div></div>
+    <div class="card-body">
+      <div class="field-label">What caused the injury? Select all that apply</div>
+      <div class="checklist" id="mechCauseList"></div>
+      <div id="mechTearQ" style="display:none;">
+        <div class="field-label">Skin tear: can the skin edges be gently moved together?</div>
+        <div class="yn-row"><div class="yn-btn yes" id="mech-tear-yes" onclick="setYN('mechanical','tearEdges',true)">Yes</div><div class="yn-btn no" id="mech-tear-no" onclick="setYN('mechanical','tearEdges',false)">No</div></div>
+      </div>
+      <div id="mechPressQ" style="display:none;">
+        <div class="field-label">Was the pressure injury caused by a bandage, tubing, or needleless connector?</div>
+        <div class="yn-row"><div class="yn-btn yes" id="mech-press-yes" onclick="setYN('mechanical','pressureCause',true)">Yes</div><div class="yn-btn no" id="mech-press-no" onclick="setYN('mechanical','pressureCause',false)">No</div></div>
+      </div>
+    </div>
+  </div>`;
+}
+function renderMechCauseList(){
+  const el = document.getElementById('mechCauseList');
+  if(!el) return;
+  el.innerHTML = mechCauses.map((c,i)=>`
+    <div class="citem"><div class="cbox ${state.mechanical.causes.has(i)?'checked':''}" id="mc-${i}" onclick="toggleMechCause(${i})">${state.mechanical.causes.has(i)?'✓':''}</div>
+    <div class="clabel" onclick="toggleMechCause(${i})">${c}</div></div>`).join('');
+  updateMechConditional();
+}
+function toggleMechCause(i){
+  if(state.mechanical.causes.has(i)) state.mechanical.causes.delete(i); else state.mechanical.causes.add(i);
+  renderMechCauseList();
+}
+function updateMechConditional(){
+  document.getElementById('mechTearQ').style.display = state.mechanical.causes.has(2) ? 'block':'none';
+  document.getElementById('mechPressQ').style.display = state.mechanical.causes.has(4) ? 'block':'none';
+}
+function validateMechanical(){
+  if(state.mechanical.causes.size===0){ alert('Select at least one cause.'); return false; }
+  if(state.mechanical.causes.has(2) && state.mechanical.tearEdges===null){ alert('Please answer the skin tear question.'); return false; }
+  if(state.mechanical.causes.has(4) && state.mechanical.pressureCause===null){ alert('Please answer the pressure injury question.'); return false; }
+  return true;
+}
+
+/* ---------------- SHARED HELPERS ---------------- */
+function setYN(cat, field, val){
+  state[cat][field] = val;
+  const prefix = {infection:'inf', dermatitis:'der', mechanical:'mech'}[cat];
+  const key = {neutropenic:'neu', dressingIntact:'dr', skinBroken:'sk', infiltration:'inf', areaMatches:'area', tearEdges:'tear', pressureCause:'press'}[field];
+  const y = document.getElementById(prefix+'-'+key+'-yes');
+  const n = document.getElementById(prefix+'-'+key+'-no');
+  if(y&&n){ y.classList.toggle('selected', val===true); n.classList.toggle('selected', val===false); }
+}
+
+function renderQueueScreen(name){
+  const map = {
+    'infection-signs': renderInfectionSigns, 'infection-assess': renderInfectionAssess,
+    'dermatitis-signs': renderDermatitisSigns, 'dermatitis-assess': renderDermatitisAssess,
+    'mechanical-signs': renderMechanicalSigns, 'mechanical-assess': renderMechanicalAssess
+  };
+  if(map[name]){
+    document.querySelector(`.screen[data-screen="${name}"]`).innerHTML = map[name]();
+    if(name==='dermatitis-assess') renderDerCauseList();
+    if(name==='mechanical-assess') renderMechCauseList();
+  }
+}
+
+/* ---------------- SUMMARY BUILDERS ---------------- */
+function riskTagsHTML(){
+  if(state.risks.size===0) return '<span class="pill b">No risk factors documented</span>';
+  return Array.from(state.risks).map(i=>`<span class="pill a">${riskFactors[i]}</span>`).join('');
+}
+
+function buildStandardCareSummary(){
+  const box = document.getElementById('riskSummaryTags');
+  const wrap = document.getElementById('riskSummaryBlock');
+  if(state.risks.size>0){
+    wrap.style.display='block';
+    box.innerHTML = riskTagsHTML();
+  } else { wrap.style.display='none'; }
+}
+
+function infectionHTML(){
+  const s = state.infection;
+  let items = [
+    "Remove exudate with sterile NaCl",
+    "Continue 2% CHG in 70% IPA swab sticks",
+    "Ensure correct application of CHG disc — shiny side up, 360° coverage around the catheter at the exit site, gel pad covering exit site, split at 5 or 7 o'clock",
+    "Referral for vascular access team / nurse practitioner / consultant or medical team assessment"
+  ];
+  let notes = [];
+  if(s.neutropenic) notes.push("Patient is neutropenic — escalate to medical team promptly given infection risk.");
+  if(s.dressingIntact===false) notes.push("Dressing is not clean/dry/intact — replace now rather than waiting for the scheduled change.");
+  if(s.skinBroken) notes.push("Skin is broken — handle with extra care during cleansing and dressing application.");
+  if(s.exudate) notes.push("Documented exudate: "+s.exudate+".");
+  return `
+  <div class="summary-block">
+    <h4>🦠 Local skin infection — management</h4>
+    <ul class="plain">${items.map(i=>`<li>${i}</li>`).join('')}</ul>
+    ${notes.length?`<div class="ib a"><strong>Assessment notes</strong>${notes.join(' ')}</div>`:''}
+    <div class="ib b"><strong>Orders / escalation</strong>As per orders — swab culture of exit site, systemic antibiotics, potential CVAD removal. Continue regular observation, patient assessment and documentation.</div>
+    <div class="ib r"><strong>Critical practice point</strong>Allow skin to completely air dry before applying any dressing materials.</div>
+  </div>`;
+}
+
+function dermatitisHTML(){
+  const s = state.dermatitis;
+  const causeLabels = Array.from(s.causes).map(i=>derCauses[i]);
+  let antisepsis = [];
+  if(s.causes.has(0)) antisepsis.push("Suspected CHG irritant/allergen: perform a skin patch test (apply to forearm, monitor 30–60 min, then over 2–3 days).");
+  if(s.causes.has(1)) antisepsis.push("Suspected IPA irritant: change to aqueous CHG.");
+  if(s.severity==='mild') antisepsis.push("Mild CHG sensitivity: change to 0.5% CHG concentration.");
+  if(s.severity==='severe' || s.skinBroken) antisepsis.push("Severe reaction or broken skin: perform a skin patch test with povidone-iodine 10%, or use sterile NaCl.");
+  if(s.skinBroken) antisepsis.push("Broken skin: use aqueous CHG to avoid the pain IPA causes on broken skin.");
+  if(s.severity==='severe') antisepsis.push("Severe skin impairment: use sterile NaCl for maintenance procedures — allow greater drying time.");
+  if(!s.skinBroken) antisepsis.push("If skin remains intact: continue 2% CHG in 70% IPA; consider temporary reduction to 0.5% CHG in 70% IPA or aqueous until healed.");
+  antisepsis.push("Potentially more than one irritant — patch test all suspected solutions; use NaCl in the meantime if severe.");
+
+  let dressing = [
+    "CHG gel bordered TSM allows observation of the exit site",
+    "Add an antimicrobial disc if not currently used (CHG Biopatch®/gel, silver Acticoat™ Site, or PHMB Kendall™ AMD)",
+    "Use NaCl or alcohol-free adhesive removal products to remove the dressing; cleanse skin with sterile NaCl before reapplying antisepsis",
+    "Consider an alternate dressing material (e.g. IV3000™, Opsite Flexigrid™, SorbaView Shield®, 3M™ Tegaderm™ I.V. Advanced Securement Dressing)",
+    "Slightly move dressing materials to avoid applying adhesive to the same skin area each time"
+  ];
+  if(s.exudate && s.exudate!=='None') dressing.unshift("For exudate: use an absorbent dressing material kept separate from the exit site (e.g. Mepilex® Border, Mepilex Lite®, Biatain®)");
+
+  let protection = ["Avoid hydrocolloid materials — not appropriate for CVAD use"];
+  if(!s.skinBroken){
+    protection.push("Unbroken skin: use alcohol-free skin barrier film (e.g. Cavilon™ No Sting Barrier Film) and ensure skin is completely air dry before dressing application");
+  } else {
+    protection.push("Broken skin: protect with a silicone adhesive material, or an alcohol-free skin barrier film designed for broken skin (e.g. 3M™ Cavilon™ Advanced Skin Protectant)");
+  }
+  if(s.severity==='severe') protection.push("Severe cases: place silicone adhesive dressing material over the broken skin and situate all other dressing materials on top");
+  if(s.exudate==='High moisture / ooze') protection.push("High moisture/ooze: use a silicone adhesive material with absorbent properties (e.g. Mepilex® Border or Biatain® Silicone)");
+
+  let securement = [
+    "Ensure adhesive ESD is not positioned over or adjacent to the catheter exit site",
+    "Consider a subcutaneous ESD — no adhesive involved, does not need replacing every dressing",
+    "Move adhesive ESD to a different area of skin to avoid ongoing impairment",
+    "Place silicone adhesive material between the skin and the adhesive or subcutaneous ESD"
+  ];
+
+  return `
+  <div class="summary-block">
+    <h4>🧴 Contact dermatitis — management</h4>
+    ${causeLabels.length?`<div class="tag-row">${causeLabels.map(c=>`<span class="pill a">${c}</span>`).join('')}<span class="pill ${s.severity==='severe'?'r':'b'}">${s.severity? (s.severity.charAt(0).toUpperCase()+s.severity.slice(1)):'Severity not set'}</span></div>`:''}
+    <div class="field-label" style="margin-top:0;">Identify & replace suspected irritant(s), then:</div>
+    <ul class="plain">${antisepsis.map(i=>`<li>${i}</li>`).join('')}</ul>
+    <div class="field-label">Dressing material</div>
+    <ul class="plain">${dressing.map(i=>`<li>${i}</li>`).join('')}</ul>
+    <div class="field-label">Skin protection</div>
+    <ul class="plain">${protection.map(i=>`<li>${i}</li>`).join('')}</ul>
+    <div class="field-label">Securement</div>
+    <ul class="plain">${securement.map(i=>`<li>${i}</li>`).join('')}</ul>
+    <div class="ib r"><strong>Critical practice point</strong>Minimise skin damage during dressing removal — low-and-slow technique for bordered dressings, or lateral stretch technique for flat dressings (e.g. IV3000™) while supporting the skin. Allow greater drying time for NaCl & povidone-iodine solutions.</div>
+  </div>`;
+}
+
+function mechanicalHTML(){
+  const s = state.mechanical;
+  const causeLabels = Array.from(s.causes).map(i=>mechCauses[i]);
+  let notes = [];
+  if(s.causes.has(2)) notes.push(s.tearEdges ? "Skin tear edges can be gently approximated — manage as a closable tear." : "Skin tear edges cannot be approximated — manage as an open wound and consider specialist referral.");
+  if(s.causes.has(4)) notes.push(s.pressureCause ? "Pressure injury attributed to a bandage/tubing/needleless connector — remove or reposition the causative device." : "Pressure injury cause not attributed to a bandage/tubing/NC — investigate other contributing factors.");
+  return `
+  <div class="summary-block">
+    <h4>🩹 Mechanical injury — management</h4>
+    ${causeLabels.length?`<div class="tag-row">${causeLabels.map(c=>`<span class="pill p">${c}</span>`).join('')}</div>`:''}
+    <ul class="plain">
+      <li>Avoid the mechanism of injury where possible</li>
+      <li>Protect skin from catheter hubs or needleless connectors with cushioning dressing materials; avoid tight tubing material over the dressing</li>
+    </ul>
+    <div class="field-label">Securement</div>
+    <ul class="plain">
+      <li>Move adhesive ESD to avoid the injured skin</li>
+      <li>Use a subcutaneous ESD — can place a silicone adhesive dressing underneath if required</li>
+    </ul>
+    ${notes.length?`<div class="ib a"><strong>Assessment notes</strong>${notes.join(' ')}</div>`:''}
+    <div class="ib r"><strong>Critical practice point</strong>Allow skin to completely air dry before applying any dressing materials.</div>
+  </div>`;
+}
+
+function buildSummary(){
+  let html = '';
+  if(state.risks.size>0){
+    html += `<div class="summary-block"><h4>⚠️ Documented risk factors</h4><div class="tag-row">${riskTagsHTML()}</div></div>`;
+  }
+  if(state.categories.infection) html += infectionHTML();
+  if(state.categories.dermatitis) html += dermatitisHTML();
+  if(state.categories.mechanical) html += mechanicalHTML();
+  html += `<div class="ib g"><strong>Ongoing care</strong>Continue to assess every dressing. Document all assessments, procedures & interventions. Discuss the assessment with the vascular access or wound care specialist nurse, nurse practitioner, consultant or medical team as required.</div>`;
+  document.getElementById('summaryContent').innerHTML = html;
+}
+
+/* ---------------- REFERENCE MODAL ---------------- */
+const refData = [
+  {icon:'🧪', tint:'si-b', title:'Skin antisepsis alternatives', body:`
+    <ul class="plain">
+      <li>2% CHG in 70% IPA swab sticks — e.g. Chloraprep®, 3M™ Soluprep™, Reynard Foam Swab Stick®</li>
+      <li>Prolonged antisepsis: CHG disc (e.g. Biopatch®) or CHG gel dressing (3M™ Tegaderm™ CHG)</li>
+      <li>Tissue adhesive at the exit site (bacteriostatic, haemostatic) — e.g. SecurePortIV®</li>
+      <li>Alternatives: silver or PHMB discs — e.g. Acticoat™ Site, Kendall™ AMD Antimicrobial Foam Discs</li>
+    </ul>`},
+  {icon:'🩹', tint:'si-g', title:'Dressing material alternatives', body:`
+    <ul class="plain">
+      <li>Sterile TSM — consider next-generation fabric-bordered dressings</li>
+      <li>Bordered TSM with integrated securement — e.g. SorbaView Shield® Dressing</li>
+      <li>Bordered TSM — e.g. 3M™ Tegaderm™ I.V. Advanced Securement Dressing</li>
+      <li>For exudate: absorbent, non-adhesive dressings — e.g. Mepilex® Border, Mepilex Lite®, Biatain®</li>
+    </ul>
+    <div class="divider-note">Apply without stretching or tension; ensure borders adhere fully to the skin.</div>`},
+  {icon:'🛡️', tint:'si-a', title:'Skin protection alternatives', body:`
+    <ul class="plain">
+      <li>Alcohol-free skin barrier film (not under CHG gel/disc) — e.g. Cavilon™ No Sting Barrier Film</li>
+      <li>Broken skin: silicone adhesive materials, or a barrier film designed for broken skin — e.g. 3M™ Cavilon™ Advanced Skin Protectant</li>
+      <li>Avoid hydrocolloid materials — not appropriate for CVAD use</li>
+    </ul>`},
+  {icon:'🔩', tint:'si-p', title:'Securement alternatives', body:`
+    <ul class="plain">
+      <li>Adhesive ESD — e.g. StatLock®, GripLoc®</li>
+      <li>Subcutaneous ESD (no adhesive, for impaired skin) — e.g. SecurAcath™</li>
+      <li>Tissue adhesive at the exit site — e.g. SecurePortIV®</li>
+    </ul>
+    <div class="divider-note">All external catheters should be secured at all times, ideally within 1–2 cm of the exit site.</div>`},
+  {icon:'💧', tint:'si-r', title:'Adhesive types glossary', body:`
+    <ul class="plain">
+      <li><strong>Acrylic adhesive</strong> — strong, maximises adherence time; increases skin-damage risk on removal. Use slow, low, controlled removal technique; adhesive remover wipes can help.</li>
+      <li><strong>Hydrocolloid</strong> — avoid; creates moisture under the dressing and is not appropriate for CVAD use.</li>
+      <li><strong>Silicone adhesive</strong> — gentle; can be applied over impaired skin; some variants absorb excess moisture; lower risk of damage on removal.</li>
+    </ul>`},
+  {icon:'🏥', tint:'si-n', title:'CVAD types & abbreviations', body:`
+    <ul class="plain">
+      <li>CICC — centrally inserted central catheter</li>
+      <li>tc-CICC — tunnelled cuffed CICC</li>
+      <li>PICC — peripherally inserted central catheter</li>
+      <li>TIVAD — totally implantable venous access device (portacath)</li>
+      <li>Apheresis-CICC</li>
+    </ul>
+    <div class="field-label">Abbreviations</div>
+    <ul class="plain">
+      <li>CHG — chlorhexidine gluconate · ESD — engineered securement device</li>
+      <li>IPA — isopropyl alcohol · IV — intravenous · NaCl — sodium chloride</li>
+      <li>NC — needleless connector · PHMB — polyhexamethylene biguanide · TSM — transparent semipermeable membrane</li>
+    </ul>`}
+];
+function renderRef(){
+  document.getElementById('refAccordions').innerHTML = refData.map((r,i)=>`
+    <div class="accordion" id="acc-${i}">
+      <div class="a-head" onclick="toggleAcc(${i})">
+        <div class="icon-circ ${r.tint}" style="width:32px;height:32px;font-size:15px;">${r.icon}</div>
+        <div class="card-title" style="font-size:13.5px;">${r.title}</div>
+        <div class="chev">▾</div>
+      </div>
+      <div class="a-body"><div class="a-body-in">${r.body}</div></div>
+    </div>`).join('');
+}
+function toggleAcc(i){ document.getElementById('acc-'+i).classList.toggle('open'); }
+function openRef(){ document.getElementById('refModal').classList.add('show'); }
+function closeRef(){ document.getElementById('refModal').classList.remove('show'); }
+
+/* ---------------- INIT ---------------- */
+renderRiskList();
+renderRef();
+showScreen('intro');
+</script>
+</body>
+</html>
