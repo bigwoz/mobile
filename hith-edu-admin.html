@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>HITH Education Hub — Educator Admin</title>
+<!-- Firebase (optional — configure in Settings ⚙️) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+:root{
+  --navy:#0D2D5E;--navy-mid:#164080;--blue:#1A6FAF;--blue-lt:#E5F0FA;
+  --bg:#EEF2F7;--surface:#FFFFFF;
+  --amber:#C97A00;--amber-bg:#FFFBEB;--amber-bd:#FDE68A;
+  --red:#C91B1B;--red-bg:#FEF2F2;--red-bd:#FEB4B4;
+  --green:#14803D;--green-bg:#F0FDF4;--green-bd:#A7F3C3;
+  --purple:#7C3AED;--purple-bg:#EDE9FE;
+  --teal:#0891B2;--teal-bg:#E0F2FE;
+  --muted:#6B7280;--border:#DDE3EC;--text:#1B2333;
+  --r:13px;--r-sm:8px;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* HEADER */
+.app-header{position:sticky;top:0;z-index:100;background:var(--navy);padding:12px 16px 0;}
+.hdr-top{display:flex;align-items:flex-start;justify-content:space-between;padding-bottom:10px;}
+.eyebrow{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.5);}
+.app-name{font-size:19px;font-weight:800;color:#fff;line-height:1.1;}
+.app-sub{font-size:12px;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:6px;margin-top:2px;}
+.pill{background:rgba(255,255,255,.15);color:rgba(255,255,255,.9);font-size:10px;font-weight:700;letter-spacing:.05em;padding:3px 8px;border-radius:20px;text-transform:uppercase;}
+.pill.admin{background:#C91B1B;}
+.hdr-btns{display:flex;gap:7px;align-items:center;flex-shrink:0;margin-left:10px;}
+.hbtn{padding:7px 12px;border-radius:var(--r-sm);font-size:12px;font-weight:700;cursor:pointer;border:none;display:flex;align-items:center;gap:5px;white-space:nowrap;font-family:inherit;}
+.hbtn.alert{background:var(--red);color:#fff;}
+.hbtn.icon{background:rgba(255,255,255,.12);color:#fff;padding:0;width:36px;height:36px;justify-content:center;font-size:16px;}
+
+/* MONTH TABS */
+.mtabs{display:grid;} /* columns set dynamically by JS */
+.mtab{background:transparent;border:none;color:rgba(255,255,255,.5);font-size:12px;font-weight:600;padding:9px 4px;cursor:pointer;border-bottom:3px solid transparent;text-align:center;font-family:inherit;transition:all .15s;}
+.mtab.on{color:#fff;border-bottom-color:#fff;background:rgba(255,255,255,.08);}
+.mtab-nav{background:transparent;border:none;color:rgba(255,255,255,.55);font-size:13px;font-weight:700;cursor:pointer;padding:9px 2px;border-bottom:3px solid transparent;display:flex;align-items:center;justify-content:center;transition:color .15s;}
+.mtab-nav:hover{color:#fff;}
+
+/* MAIN */
+.main{padding:16px;padding-bottom:100px;}
+
+/* THEME BANNER */
+.theme-banner{background:linear-gradient(135deg,var(--navy-mid),var(--blue));border-radius:var(--r);padding:14px 16px;margin-bottom:16px;color:#fff;}
+.tb-mo{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.65;}
+.tb-theme{font-size:15px;font-weight:800;margin-top:3px;}
+.tb-ctx{font-size:12px;opacity:.75;margin-top:2px;}
+
+/* SECTION */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.sec-title{font-size:15px;font-weight:700;}
+.sec-ct{background:var(--blue-lt);color:var(--blue);font-size:12px;font-weight:700;padding:3px 9px;border-radius:20px;}
+
+/* EVENT CARDS */
+.ev-list{display:flex;flex-direction:column;gap:10px;}
+.ev{background:var(--surface);border-radius:var(--r);box-shadow:0 1px 3px rgba(0,0,0,.06);border-left:4px solid var(--blue);overflow:hidden;}
+.ev.mandatory{border-left-color:#C91B1B;}
+.ev.cns{border-left-color:#7C3AED;}
+.ev.cvad{border-left-color:#0D2D5E;}
+.ev.diabetes{border-left-color:#14803D;}
+.ev.wound{border-left-color:#C97A00;}
+.ev.journal{border-left-color:#0891B2;}
+.ev.vascular{border-left-color:#1A6FAF;}
+.ev.flexi{border-left-color:#6B7280;}
+.ev.cancelled{opacity:.45;}
+.ev-body{padding:12px 14px;}
+.ev-meta{display:flex;align-items:center;gap:7px;margin-bottom:6px;flex-wrap:wrap;}
+.dpill{background:var(--navy);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;}
+.daypill{font-size:11px;color:var(--muted);font-weight:600;}
+.tpill{font-size:11px;color:var(--blue);background:var(--blue-lt);padding:2px 7px;border-radius:10px;font-weight:600;}
+.cancelled-tag{font-size:10px;font-weight:700;background:var(--red-bg);color:var(--red);padding:2px 7px;border-radius:10px;}
+.ev-topic{font-size:15px;font-weight:700;margin-bottom:2px;}
+.ev-series{font-size:12px;color:var(--muted);font-style:italic;margin-bottom:4px;}
+.ev-nsqhs{font-size:11px;color:var(--blue);}
+.ev-extra{font-size:12px;color:var(--muted);margin-top:4px;}
+.ev-actions{display:flex;gap:8px;padding:8px 14px;border-top:1px solid var(--border);background:#FAFCFF;}
+.bsm{font-size:12px;font-weight:600;padding:5px 11px;border-radius:var(--r-sm);border:none;cursor:pointer;font-family:inherit;}
+.bsm.edit{background:var(--blue-lt);color:var(--blue);}
+.bsm.canc{background:var(--amber-bg);color:var(--amber);}
+.bsm.del{background:var(--red-bg);color:var(--red);}
+
+/* FAB */
+.fab{position:fixed;bottom:24px;right:20px;background:var(--blue);color:#fff;border:none;width:58px;height:58px;border-radius:50%;font-size:30px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.28);display:flex;align-items:center;justify-content:center;z-index:200;font-family:inherit;}
+
+/* MODAL OVERLAY */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.52);z-index:300;display:none;align-items:flex-end;justify-content:center;}
+.ov.open{display:flex;}
+.sheet{background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-height:92vh;overflow-y:auto;padding-bottom:40px;}
+.drag{width:40px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 0;}
+.mhdr{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);}
+.mtitle{font-size:17px;font-weight:700;}
+.mclose{background:var(--bg);border:none;border-radius:50%;width:30px;height:30px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.mbody{padding:20px;}
+
+/* FORM */
+.fg{margin-bottom:15px;}
+.fl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;display:block;}
+.fi,.fs,.fta{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:14px;color:var(--text);background:var(--bg);font-family:inherit;transition:border-color .15s;-webkit-appearance:none;}
+.fi:focus,.fs:focus,.fta:focus{outline:none;border-color:var(--blue);background:#fff;}
+.fta{resize:vertical;min-height:75px;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* BUTTONS */
+.btn-p{background:var(--blue);color:#fff;border:none;padding:13px 20px;border-radius:var(--r-sm);font-size:15px;font-weight:700;cursor:pointer;width:100%;font-family:inherit;}
+.btn-s{background:var(--bg);color:var(--text);border:1.5px solid var(--border);padding:11px 20px;border-radius:var(--r-sm);font-size:14px;font-weight:600;cursor:pointer;width:100%;font-family:inherit;}
+.btn-d{background:var(--red);color:#fff;border:none;padding:11px 20px;border-radius:var(--r-sm);font-size:14px;font-weight:600;cursor:pointer;width:100%;font-family:inherit;}
+.btn-gap{display:flex;flex-direction:column;gap:9px;margin-top:4px;}
+
+/* TYPE GRID */
+.type-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
+.tchip{padding:8px 4px;border-radius:var(--r-sm);border:2px solid var(--border);text-align:center;font-size:11px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--muted);line-height:1.3;transition:all .15s;}
+.tchip span{display:block;font-size:15px;margin-bottom:2px;}
+.tchip.sel{border-color:var(--blue);background:var(--blue-lt);color:var(--blue);}
+
+/* NOTIFICATION TYPES */
+.ntypes{display:flex;gap:8px;margin-bottom:16px;}
+.nt{flex:1;padding:9px 4px;border-radius:var(--r-sm);border:2px solid var(--border);text-align:center;font-size:13px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--muted);font-family:inherit;transition:all .15s;}
+.nt.sel.info{border-color:var(--blue);background:var(--blue-lt);color:var(--blue);}
+.nt.sel.alert{border-color:var(--amber);background:var(--amber-bg);color:var(--amber);}
+.nt.sel.urgent{border-color:var(--red);background:var(--red-bg);color:var(--red);}
+
+/* DELIVERY OPTIONS */
+.dopt{display:flex;align-items:center;gap:12px;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r-sm);margin-bottom:8px;cursor:pointer;transition:all .15s;-webkit-user-select:none;user-select:none;}
+.dopt.on{border-color:var(--blue);background:var(--blue-lt);}
+.dicon{font-size:21px;width:34px;text-align:center;flex-shrink:0;}
+.dlabel{font-size:14px;font-weight:600;}
+.dsub{font-size:12px;color:var(--muted);}
+.dchk{margin-left:auto;width:22px;height:22px;border:2px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;background:#fff;flex-shrink:0;font-size:13px;font-weight:700;color:#fff;}
+.dopt.on .dchk{background:var(--blue);border-color:var(--blue);}
+
+/* NOTIF LOG */
+.nlog{padding:12px;border-radius:var(--r-sm);margin-bottom:8px;border-left:3px solid var(--blue);background:var(--blue-lt);}
+.nlog.alert-t{border-left-color:var(--amber);background:var(--amber-bg);}
+.nlog.urgent-t{border-left-color:var(--red);background:var(--red-bg);}
+.nlog-time{font-size:11px;color:var(--muted);margin-bottom:2px;}
+.nlog-title{font-size:13px;font-weight:700;margin-bottom:2px;}
+.nlog-msg{font-size:12px;}
+.nlog-via{font-size:11px;color:var(--muted);margin-top:4px;}
+
+/* TABS */
+.tabrow{display:flex;border-bottom:2px solid var(--border);margin-bottom:16px;}
+.tbtn{padding:9px 14px;font-size:13px;font-weight:600;border:none;background:transparent;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;font-family:inherit;}
+.tbtn.on{color:var(--blue);border-bottom-color:var(--blue);}
+
+/* INFO BOX */
+.ib{border-left:3px solid;padding:10px 14px;border-radius:11px;margin-bottom:14px;font-size:13px;line-height:1.5;}
+.ib.b{border-color:var(--blue);background:var(--blue-lt);}
+.ib.a{border-color:var(--amber);background:var(--amber-bg);}
+.ib strong{display:block;margin-bottom:2px;font-size:12px;text-transform:uppercase;letter-spacing:.04em;}
+
+/* TOAST */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:600;opacity:0;transition:opacity .3s;white-space:nowrap;pointer-events:none;}
+.toast.show{opacity:1;}
+
+/* EMPTY */
+.empty{text-align:center;padding:40px 20px;color:var(--muted);}
+.empty-icon{font-size:38px;margin-bottom:8px;}
+
+/* CONTACTS */
+.ct-add-row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;margin-bottom:14px;}
+.ct-add-btn{background:var(--blue);color:#fff;border:none;border-radius:var(--r-sm);padding:10px 14px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;}
+.ct-add-btn.update{background:var(--green);}
+.ct-cancel-edit{background:var(--bg);color:var(--muted);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;font-size:13px;font-weight:600;cursor:pointer;width:100%;font-family:inherit;margin-top:6px;}
+.ct-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border-radius:var(--r-sm);margin-bottom:7px;}
+.ct-info{flex:1;min-width:0;}
+.ct-name{font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ct-mobile{font-size:12px;color:var(--muted);margin-top:1px;}
+.ct-btns{display:flex;gap:6px;flex-shrink:0;}
+.cbtn{font-size:12px;font-weight:600;padding:5px 10px;border-radius:var(--r-sm);border:none;cursor:pointer;font-family:inherit;}
+.cbtn.edit{background:var(--blue-lt);color:var(--blue);}
+.cbtn.del{background:var(--red-bg);color:var(--red);}
+/* SMS PICKER */
+.sms-pick-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border-radius:var(--r-sm);margin-bottom:7px;cursor:pointer;-webkit-user-select:none;user-select:none;border:1.5px solid transparent;transition:all .12s;}
+.sms-pick-item.checked{background:var(--blue-lt);border-color:var(--blue);}
+.sms-pick-chk{width:22px;height:22px;border:2px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;background:#fff;flex-shrink:0;font-size:13px;font-weight:700;}
+.sms-pick-item.checked .sms-pick-chk{background:var(--blue);border-color:var(--blue);color:#fff;}
+.sms-pick-name{font-size:14px;font-weight:600;}
+.sms-pick-num{font-size:12px;color:var(--muted);}
+.sms-sel-row{display:flex;gap:8px;margin:6px 0 10px;}
+.sms-sel-btn{font-size:12px;font-weight:600;padding:5px 12px;border-radius:20px;border:1.5px solid var(--border);background:var(--bg);color:var(--muted);cursor:pointer;font-family:inherit;}
+.sms-action-row{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:4px;}
+.sms-open-btn{background:var(--green);color:#fff;border:none;padding:12px;border-radius:var(--r-sm);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sms-copy-btn{background:var(--bg);color:var(--text);border:1.5px solid var(--border);padding:12px 14px;border-radius:var(--r-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;}
+.sms-note{font-size:11px;color:var(--muted);margin-top:8px;font-style:italic;}
+
+.hidden{display:none!important;}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="hdr-top">
+    <div>
+      <div class="eyebrow">St Vincent's Hospital Melbourne · HITH / Community Nursing</div>
+      <div class="app-name">Education Hub</div>
+      <div class="app-sub">Educator Admin <span class="pill admin">ADMIN</span></div>
+    </div>
+    <div class="hdr-btns">
+      <button class="hbtn alert" onclick="openAlertModal()">🔔 Send Alert</button>
+      <button class="hbtn icon" onclick="openSettings()">⚙️</button>
+    </div>
+  </div>
+  <div class="mtabs" id="mtabs"></div>
+</header>
+
+<main class="main" id="main"></main>
+
+<button class="fab" onclick="openAddModal()" title="Add Session">+</button>
+<div class="toast" id="toast"></div>
+
+<!-- ADD / EDIT EVENT MODAL -->
+<div class="ov" id="evModal" onclick="ovClick(event,'evModal')">
+ <div class="sheet">
+  <div class="drag"></div>
+  <div class="mhdr">
+    <div class="mtitle" id="evModalTitle">Add Session</div>
+    <button class="mclose" onclick="closeModal('evModal')">✕</button>
+  </div>
+  <div class="mbody">
+    <input type="hidden" id="editId">
+    <div class="fg"><label class="fl">Date</label><input type="date" class="fi" id="evDate"></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Start Time</label><input type="time" class="fi" id="evTs" value="15:00"></div>
+      <div class="fg"><label class="fl">End Time</label><input type="time" class="fi" id="evTe" value="15:30"></div>
+    </div>
+    <div class="fg"><label class="fl">Topic / Session Title</label><input type="text" class="fi" id="evTopic" placeholder="e.g. BLS Annual Update"></div>
+    <div class="fg"><label class="fl">Series / Context</label><input type="text" class="fi" id="evSeries" placeholder="e.g. Mandatory Competency"></div>
+    <div class="fg"><label class="fl">NSQHS Standards</label><input type="text" class="fi" id="evNsqhs" placeholder="e.g. NSQHS 1 · NSQHS 5"></div>
+    <div class="fg">
+      <label class="fl">Location *</label>
+      <select class="fs" id="evLocSel" onchange="handleLocSel()">
+        <option value="">— Select location —</option>
+        <option>L3 Debrief Room 1</option>
+        <option>L3 Debrief Room 2</option>
+        <option>L3 Debrief Room 3</option>
+        <option>L3 Debrief Room</option>
+        <option>L3 Clinical Workshop</option>
+        <option>L3 Skills Room 1</option>
+        <option>L3 Skills Room 2</option>
+        <option>L3 Skills Room 3</option>
+        <option>L2 Meeting Room</option>
+        <option>L2 Conference Room</option>
+        <option>L1 @Home Team Room</option>
+        <option>Bldg A Mortuary Lecture Theatre</option>
+        <option value="__other__">Other — free text…</option>
+      </select>
+      <input type="text" class="fi" id="evLocOther" placeholder="Enter location…" style="margin-top:8px;display:none;">
+    </div>
+    <div class="fg">
+      <label class="fl">Category</label>
+      <div class="type-grid">
+        <div class="tchip" data-t="mandatory" onclick="selType(this)"><span>🚨</span>Mandatory</div>
+        <div class="tchip" data-t="cns" onclick="selType(this)"><span>📚</span>CNS Series</div>
+        <div class="tchip" data-t="cvad" onclick="selType(this)"><span>💉</span>CVAD</div>
+        <div class="tchip" data-t="diabetes" onclick="selType(this)"><span>🩸</span>Diabetes</div>
+        <div class="tchip" data-t="wound" onclick="selType(this)"><span>🩹</span>Wound Care</div>
+        <div class="tchip" data-t="journal" onclick="selType(this)"><span>📖</span>Journal Club</div>
+        <div class="tchip" data-t="vascular" onclick="selType(this)"><span>🫀</span>Vascular</div>
+        <div class="tchip" data-t="flexi" onclick="selType(this)"><span>📋</span>Other/Flexi</div>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">Notes / Preparation</label><textarea class="fta" id="evNotes" placeholder="Additional info for attendees…"></textarea></div>
+    <div class="btn-gap">
+      <button class="btn-p" onclick="saveEvent()">Save Session</button>
+      <button id="delEvBtn" class="btn-d hidden" onclick="deleteEvFromModal()">Delete Session</button>
+      <button class="btn-s" onclick="closeModal('evModal')">Cancel</button>
+    </div>
+  </div>
+ </div>
+</div>
+
+<!-- SEND ALERT MODAL -->
+<div class="ov" id="alertModal" onclick="ovClick(event,'alertModal')">
+ <div class="sheet">
+  <div class="drag"></div>
+  <div class="mhdr">
+    <div class="mtitle">Send Staff Alert</div>
+    <button class="mclose" onclick="closeModal('alertModal')">✕</button>
+  </div>
+  <div class="mbody">
+    <div class="tabrow">
+      <button class="tbtn on" id="tab-compose" onclick="alertTab('compose')">✍️ Compose</button>
+      <button class="tbtn" id="tab-contacts" onclick="alertTab('contacts')">👥 Contacts</button>
+      <button class="tbtn" id="tab-log" onclick="alertTab('log')">📋 History</button>
+    </div>
+    <div id="pane-compose">
+      <div class="fg">
+        <label class="fl">Alert Type</label>
+        <div class="ntypes">
+          <button class="nt sel info" data-nt="info" onclick="selNType(this)">ℹ️ Info</button>
+          <button class="nt alert" data-nt="alert" onclick="selNType(this)">⚠️ Alert</button>
+          <button class="nt urgent" data-nt="urgent" onclick="selNType(this)">🚨 Urgent</button>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Title</label><input type="text" class="fi" id="nTitle" placeholder="e.g. Session rescheduled — 14 Jul"></div>
+      <div class="fg"><label class="fl">Message</label><textarea class="fta" id="nMsg" placeholder="Notification message for staff…"></textarea></div>
+      <div class="fg">
+        <label class="fl">Delivery Channels</label>
+        <div class="dopt on" id="d-inapp" onclick="togDel(this,'inapp')">
+          <div class="dicon">📱</div>
+          <div><div class="dlabel">In-App Notification</div><div class="dsub">Appears in staff companion app immediately</div></div>
+          <div class="dchk">✓</div>
+        </div>
+        <div class="dopt" id="d-browser" onclick="togDel(this,'browser')">
+          <div class="dicon">🖥️</div>
+          <div><div class="dlabel">Browser Push</div><div class="dsub">Desktop notification (staff app must be open)</div></div>
+          <div class="dchk"></div>
+        </div>
+        <div class="dopt" id="d-email" onclick="togDel(this,'email')">
+          <div class="dicon">📧</div>
+          <div><div class="dlabel">Email</div><div class="dsub">Via EmailJS — configure in Settings ⚙️</div></div>
+          <div class="dchk"></div>
+        </div>
+        <div class="dopt" id="d-sms" onclick="togDel(this,'sms')">
+          <div class="dicon">💬</div>
+          <div><div class="dlabel">Group SMS</div><div class="dsub">Send to saved staff contacts via SMS app</div></div>
+          <div class="dchk"></div>
+        </div>
+      </div>
+      <div class="fg hidden" id="emailSection">
+        <label class="fl">Email Recipients</label>
+        <textarea class="fta" id="emailRecips" placeholder="nurse@svhm.org, another@svhm.org…" style="min-height:60px;"></textarea>
+      </div>
+      <div class="fg hidden" id="smsSection">
+        <label class="fl">SMS Recipients</label>
+        <div id="smsContactPicker"></div>
+        <div class="sms-sel-row">
+          <button class="sms-sel-btn" onclick="smsSelectAll(true)">Select All</button>
+          <button class="sms-sel-btn" onclick="smsSelectAll(false)">None</button>
+        </div>
+        <div class="sms-action-row">
+          <button class="sms-open-btn" onclick="openSmsApp()">📱 Open in SMS App</button>
+          <button class="sms-copy-btn" onclick="copySmsText()">📋 Copy</button>
+        </div>
+        <div class="sms-note">
+          <strong>Single recipient:</strong> name, number and message pre-fill automatically on all devices.<br>
+          <strong>Multiple recipients on iPhone/iPad:</strong> recipients pre-fill in the To field; message is copied to clipboard automatically — tap and hold in the message field then <em>Paste</em>.<br>
+          <strong>Android:</strong> both recipients and message pre-fill automatically.
+        </div>
+      </div>
+      <div class="btn-gap">
+        <button class="btn-p" onclick="sendAlert()">📤 Send Now</button>
+        <button class="btn-s" onclick="closeModal('alertModal')">Cancel</button>
+      </div>
+    </div>
+    <div id="pane-log" class="hidden">
+      <div id="logContent"></div>
+    </div>
+    <div id="pane-contacts" class="hidden">
+      <div class="fg">
+        <label class="fl" id="ctFormLabel">Add Staff Contact</label>
+        <div class="ct-add-row">
+          <input type="text" class="fi" id="ctName" placeholder="Full name">
+          <input type="tel" class="fi" id="ctMobile" placeholder="04XX XXX XXX">
+          <button class="ct-add-btn" id="ctSaveBtn" onclick="saveContact()">+ Add</button>
+        </div>
+        <input type="hidden" id="ctEditId">
+        <button class="ct-cancel-edit hidden" id="ctCancelBtn" onclick="cancelEditContact()">✕ Cancel edit</button>
+      </div>
+      <div id="contactList"></div>
+    </div>
+  </div>
+ </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="ov" id="settingsModal" onclick="ovClick(event,'settingsModal')">
+ <div class="sheet">
+  <div class="drag"></div>
+  <div class="mhdr">
+    <div class="mtitle">⚙️ Settings</div>
+    <button class="mclose" onclick="closeModal('settingsModal')">✕</button>
+  </div>
+  <div class="mbody">
+    <div class="ib b"><strong>How sync works</strong>Same-browser tabs sync instantly via BroadcastChannel — no setup needed. For multi-device hospital deployment, configure Firebase below.</div>
+    <div class="tabrow">
+      <button class="tbtn on" id="st-fb" onclick="settTab('fb')">Firebase</button>
+      <button class="tbtn" id="st-ejs" onclick="settTab('ejs')">EmailJS</button>
+      <button class="tbtn" id="st-data" onclick="settTab('data')">Data</button>
+    </div>
+    <div id="sp-fb">
+      <div class="ib a"><strong>Optional — multi-device sync</strong>Create a free Firebase project at console.firebase.google.com, enable Realtime Database, and paste your config values here.</div>
+      <div class="fg"><label class="fl">API Key</label><input class="fi" id="fb-api" placeholder="AIzaSy…"></div>
+      <div class="fg"><label class="fl">Auth Domain</label><input class="fi" id="fb-auth" placeholder="project.firebaseapp.com"></div>
+      <div class="fg"><label class="fl">Database URL</label><input class="fi" id="fb-db" placeholder="https://project-default-rtdb.firebaseio.com"></div>
+      <div class="fg"><label class="fl">Project ID</label><input class="fi" id="fb-proj" placeholder="your-project-id"></div>
+      <div class="btn-gap"><button class="btn-p" onclick="saveFB()">Save & Connect Firebase</button></div>
+    </div>
+    <div id="sp-ejs" class="hidden">
+      <div class="ib a"><strong>Email notifications via EmailJS</strong>Sign up free at emailjs.com, create a Gmail/Outlook service and an email template, then add your IDs here.</div>
+      <div class="fg"><label class="fl">Service ID</label><input class="fi" id="ejs-svc" placeholder="service_xxxxxxx"></div>
+      <div class="fg"><label class="fl">Template ID</label><input class="fi" id="ejs-tpl" placeholder="template_xxxxxxx"></div>
+      <div class="fg"><label class="fl">Public Key</label><input class="fi" id="ejs-key" placeholder="your_public_key"></div>
+      <div class="btn-gap"><button class="btn-p" onclick="saveEJS()">Save EmailJS Config</button></div>
+    </div>
+    <div id="sp-data" class="hidden">
+      <div class="ib a"><strong>Data management</strong>Export a backup or reset the calendar. Resetting restores the default Jul–Nov 2026 schedule.</div>
+      <div class="btn-gap">
+        <button class="btn-s" onclick="exportData()">📥 Export Data (JSON)</button>
+        <button class="btn-s" onclick="resetSeed()">🔄 Reset to Default Calendar</button>
+        <button class="btn-d" onclick="clearAll()">⚠️ Clear All Data</button>
+      </div>
+    </div>
+  </div>
+ </div>
+</div>
+
+<script>
+/* ===== SEED DATA ===== */
+// Named themes for known months — any other month gets a generic banner
+const MONTH_THEMES={
+  '2026-07':{theme:'Diabetes Care & Vascular Assessment',ctx:'Aligning with National Diabetes Week: 12–19 July'},
+  '2026-08':{theme:'Stroke Care & High-Tech Wound Management',ctx:'Aligning with National Stroke Week: 2–9 Aug'},
+  '2026-09':{theme:'Oncology, Lymphoma & Vascular Protection',ctx:'Aligning with Lymphoma Awareness Month'},
+  '2026-10':{theme:'Mental Health, Cognition & Patient Safety',ctx:'Aligning with National Mental Health Month'},
+  '2026-11':{theme:'Advanced Clinical Skills & Year-End Competencies',ctx:''},
+};
+// Derives an ordered month list from whichever months have events
+function deriveMonths(){
+  const keys=[...new Set(events.map(e=>e.date.slice(0,7)))].sort();
+  return keys.map(ym=>{
+    const yr=parseInt(ym.slice(0,4)), mo=parseInt(ym.slice(5,7));
+    const d=new Date(yr,mo-1,1);
+    const t=MONTH_THEMES[ym]||{theme:'',ctx:''};
+    return {k:ym, label:d.toLocaleDateString('en-AU',{month:'short',year:'numeric'}),
+            short:d.toLocaleDateString('en-AU',{month:'short'}), yr, mo, ...t};
+  });
+}
+const SEED=[
+  // JULY
+  {id:'e001',date:'2026-07-06',topic:'BLS Annual Update',series:'Mandatory Competency',nsqhs:'NSQHS 8 · NSQHS 1',type:'mandatory',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e002',date:'2026-07-07',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e003',date:'2026-07-09',topic:'Diabetes: Newly Diagnosed Patient Care',series:'Prep for Diabetes Week',nsqhs:'NSQHS 2 · NSQHS 5',type:'diabetes',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e004',date:'2026-07-13',topic:'CVAD Overview',series:'Vascular Access',nsqhs:'NSQHS 5 · NSQHS 3',type:'cvad',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e005',date:'2026-07-14',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e006',date:'2026-07-16',topic:'Diabetes: Sick Day Management',series:'National Diabetes Week',nsqhs:'NSQHS 2 · NSQHS 5',type:'diabetes',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e007',date:'2026-07-20',topic:'BLS Annual Update',series:'Mandatory Competency',nsqhs:'NSQHS 8 · NSQHS 1',type:'mandatory',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e008',date:'2026-07-21',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e009',date:'2026-07-23',topic:'Doppler ABI Measurements',series:'Peripheral Vascular Assessment',nsqhs:'NSQHS 5',type:'vascular',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e010',date:'2026-07-27',topic:'CVAD Alteplase Administration',series:'Vascular Access',nsqhs:'NSQHS 4 · NSQHS 5',type:'cvad',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e011',date:'2026-07-28',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e012',date:'2026-07-30',topic:'Cognitive Assessments',series:'Aged Care / Delirium Screening',nsqhs:'NSQHS 5 · NSQHS 8',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  // AUGUST
+  {id:'e013',date:'2026-08-03',topic:'BLS Annual Update',series:'Mandatory Competency',nsqhs:'NSQHS 8 · NSQHS 1',type:'mandatory',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e014',date:'2026-08-04',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e015',date:'2026-08-06',topic:'Neurological Assessment & Stroke Triaging',series:'National Stroke Week',nsqhs:'NSQHS 8 · NSQHS 5',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e016',date:'2026-08-07',topic:'Journal Club: Stroke Mimics & Community Care',series:'Evidence-Based Practice',nsqhs:'NSQHS 1',type:'journal',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e017',date:'2026-08-10',topic:'CVAD Dressing & Line Maintenance',series:'Vascular Access',nsqhs:'NSQHS 3 · NSQHS 5',type:'cvad',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e018',date:'2026-08-11',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e019',date:'2026-08-13',topic:'VAC Dressings (NPWT): Setup & Troubleshooting',series:'Wound Care',nsqhs:'NSQHS 5 · NSQHS 3',type:'wound',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e020',date:'2026-08-14',topic:'Clinical Photography Standards for Wounds',series:'Documentation & Governance',nsqhs:'NSQHS 1 · NSQHS 2',type:'wound',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e021',date:'2026-08-17',topic:'BLS Annual Update',series:'Mandatory Competency',nsqhs:'NSQHS 8 · NSQHS 1',type:'mandatory',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e022',date:'2026-08-18',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e023',date:'2026-08-20',topic:'Specific Wound Care Products: Selection Matrix',series:'Wound Care',nsqhs:'NSQHS 5',type:'wound',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e024',date:'2026-08-21',topic:'Case Study: Complex Debridement Pathways',series:'Wound Care',nsqhs:'NSQHS 5',type:'wound',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e025',date:'2026-08-24',topic:'CVAD Overview',series:'Vascular Access',nsqhs:'NSQHS 5 · NSQHS 3',type:'cvad',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e026',date:'2026-08-25',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e027',date:'2026-08-27',topic:'ECG Interpretation: Rhythms & Escalation',series:'Cardiac Assessment',nsqhs:'NSQHS 8 · NSQHS 5',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e028',date:'2026-08-28',topic:'Open Q&A / Competency Sign-off Catch-up',series:'Flexi Session',nsqhs:'NSQHS 1',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e029',date:'2026-08-31',topic:'BLS Annual Update',series:'Mandatory Competency',nsqhs:'NSQHS 8 · NSQHS 1',type:'mandatory',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  // SEPTEMBER
+  {id:'e030',date:'2026-09-01',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e031',date:'2026-09-03',topic:'TIVAD Access & Gripper Needle Insertion/Removal',series:'Lymphoma Month Anchor',nsqhs:'NSQHS 5 · NSQHS 3',type:'cvad',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e032',date:'2026-09-04',topic:'Lymphoma: Recognition of Red Flags & Symptoms',series:'Lymphoma Month Anchor',nsqhs:'NSQHS 5 · NSQHS 8',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e033',date:'2026-09-07',topic:'CVAD Alteplase Administration',series:'Vascular Access',nsqhs:'NSQHS 4 · NSQHS 5',type:'cvad',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e034',date:'2026-09-08',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e035',date:'2026-09-10',topic:'Journal Club: Sepsis Prevention in Oncology Patients',series:'R U OK? Day Focus',nsqhs:'NSQHS 3 · NSQHS 8',type:'journal',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e036',date:'2026-09-11',topic:'Malignant Wound Management',series:'Oncology / Wound Care',nsqhs:'NSQHS 5',type:'wound',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e037',date:'2026-09-14',topic:'BLS Annual Update',series:'Mandatory Competency',nsqhs:'NSQHS 8 · NSQHS 1',type:'mandatory',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e038',date:'2026-09-15',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e039',date:'2026-09-17',topic:'Compression Bandaging: Principles & Safety',series:'Chronic Oedema Management',nsqhs:'NSQHS 5',type:'wound',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e040',date:'2026-09-18',topic:'Skin Tears: STAR Classification & Dressings',series:'Wound Care',nsqhs:'NSQHS 5',type:'wound',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e041',date:'2026-09-21',topic:'CVAD Dressing & Line Maintenance',series:'Vascular Access',nsqhs:'NSQHS 3 · NSQHS 5',type:'cvad',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e042',date:'2026-09-22',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e043',date:'2026-09-24',topic:'AKI / Managing Patients & Red Flags',series:'Clinical Education',nsqhs:'NSQHS 5 · NSQHS 3',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e044',date:'2026-09-25',topic:'Patient Education Strategies for Home Infusions',series:'Clinical Education',nsqhs:'NSQHS 2 · NSQHS 5',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e045',date:'2026-09-28',topic:'BLS Annual Update',series:'Mandatory Competency',nsqhs:'NSQHS 8 · NSQHS 1',type:'mandatory',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e046',date:'2026-09-29',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  // OCTOBER
+  {id:'e047',date:'2026-10-01',topic:'Cognitive Assessments: Delirium vs. Dementia',series:'Mental Health Month',nsqhs:'NSQHS 5 · NSQHS 8',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e048',date:'2026-10-02',topic:'De-escalation & Communication Strategies',series:'Patient Safety',nsqhs:'NSQHS 8 · NSQHS 2',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e049',date:'2026-10-05',topic:'CVAD Overview',series:'Vascular Access',nsqhs:'NSQHS 5 · NSQHS 3',type:'cvad',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e050',date:'2026-10-06',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e051',date:'2026-10-08',topic:'Wound Care: The TIMERS Framework',series:'Wound Care',nsqhs:'NSQHS 5',type:'wound',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e052',date:'2026-10-09',topic:'Journal Club: Medication Safety in the Home',series:'Evidence-Based Practice',nsqhs:'NSQHS 4 · NSQHS 1',type:'journal',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e053',date:'2026-10-12',topic:'BLS Annual Update',series:'Mandatory Competency',nsqhs:'NSQHS 8 · NSQHS 1',type:'mandatory',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e054',date:'2026-10-13',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e055',date:'2026-10-15',topic:'Diabetes: Flash Glucose Monitoring Devices',series:'Diabetes Care',nsqhs:'NSQHS 5 · NSQHS 2',type:'diabetes',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e056',date:'2026-10-16',topic:'Case Study: Managing Chronic Venous Ulcers',series:'Wound Care',nsqhs:'NSQHS 5',type:'wound',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e057',date:'2026-10-19',topic:'CVAD Alteplase Administration',series:'Vascular Access',nsqhs:'NSQHS 4 · NSQHS 5',type:'cvad',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e058',date:'2026-10-20',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e059',date:'2026-10-22',topic:'ECG Interpretation: Ischaemic Changes',series:'Cardiac Assessment',nsqhs:'NSQHS 8 · NSQHS 5',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e060',date:'2026-10-23',topic:'Medical Device Tracking & Governance',series:'Audit & Quality Assurance',nsqhs:'NSQHS 1',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e061',date:'2026-10-26',topic:'BLS Annual Update',series:'Mandatory Competency',nsqhs:'NSQHS 8 · NSQHS 1',type:'mandatory',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e062',date:'2026-10-27',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e063',date:'2026-10-29',topic:'TIVAD Management: Troubleshooting Patency',series:'Vascular Access',nsqhs:'NSQHS 5 · NSQHS 4',type:'cvad',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e064',date:'2026-10-30',topic:'Open Review / Competency Sign-offs',series:'Flexi Session',nsqhs:'NSQHS 1',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  // NOVEMBER
+  {id:'e065',date:'2026-11-02',topic:'CVAD Dressing & Line Maintenance',series:'Vascular Access',nsqhs:'NSQHS 3 · NSQHS 5',type:'cvad',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e066',date:'2026-11-03',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e067',date:'2026-11-05',topic:'VAC Dressings (NPWT): Complex Cavities',series:'Wound Care',nsqhs:'NSQHS 5 · NSQHS 3',type:'wound',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e068',date:'2026-11-06',topic:'Doppler ABI Assessments: Practical Workshop',series:'Skill Refinement',nsqhs:'NSQHS 5',type:'vascular',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e069',date:'2026-11-09',topic:'BLS Annual Update',series:'Mandatory Competency',nsqhs:'NSQHS 8 · NSQHS 1',type:'mandatory',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e070',date:'2026-11-10',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e071',date:'2026-11-12',topic:'Surgical Drains: Troubleshooting & Complications',series:'Post-Operative Care',nsqhs:'NSQHS 5 · NSQHS 3',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e072',date:'2026-11-13',topic:'Journal Club: Antimicrobial Stewardship',series:'Evidence-Based Practice',nsqhs:'NSQHS 3 · NSQHS 4',type:'journal',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e073',date:'2026-11-16',topic:'CVAD Overview',series:'Vascular Access',nsqhs:'NSQHS 5 · NSQHS 3',type:'cvad',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e074',date:'2026-11-17',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e075',date:'2026-11-19',topic:'Compression Bandaging: Multi-layer Systems',series:'Wound Care',nsqhs:'NSQHS 5',type:'wound',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e076',date:'2026-11-20',topic:'Cognitive Assessments in Acute Settings',series:'Assessment Skills',nsqhs:'NSQHS 5 · NSQHS 8',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e077',date:'2026-11-23',topic:'BLS Annual Update',series:'Mandatory Competency',nsqhs:'NSQHS 8 · NSQHS 1',type:'mandatory',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e078',date:'2026-11-24',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e079',date:'2026-11-26',topic:'Diabetes Management: Frail & Elderly Patients',series:'Diabetes Care',nsqhs:'NSQHS 5 · NSQHS 2',type:'diabetes',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e080',date:'2026-11-27',topic:'Final Competency Audit & Review',series:'Quality Assurance',nsqhs:'NSQHS 1',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e081',date:'2026-11-30',topic:'CVAD Alteplase Administration',series:'Vascular Access',nsqhs:'NSQHS 4 · NSQHS 5',type:'cvad',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+];
+
+const LOC_PRESETS=['L3 Debrief Room 1','L3 Debrief Room 2','L3 Debrief Room 3','L3 Debrief Room','L3 Clinical Workshop','L3 Skills Room 1','L3 Skills Room 2','L3 Skills Room 3','L2 Meeting Room','L2 Conference Room','L1 @Home Team Room','Bldg A Mortuary Lecture Theatre'];
+
+/* ===== STATE ===== */
+let events=[], notifs=[], contacts=[], curMo=0, curType='mandatory', curNType='info';
+let delivery={inapp:true,browser:false,email:false,sms:false};
+let bc=null, fbDB=null, tabOffset=0, MONTHS=[];
+let pendingEvWrite=false, pendingNotifWrite=false, pendingCtWrite=false;
+let editingContactId=null;
+let FBCFG={}, EJSCFG={};
+
+/* ===== INIT ===== */
+function init(){
+  FBCFG=JSON.parse(localStorage.getItem('hith_fb')||'{}');
+  EJSCFG=JSON.parse(localStorage.getItem('hith_ejs')||'{}');
+  const ev=localStorage.getItem('hith_events');
+  events=ev?JSON.parse(ev):[...SEED];
+  if(!ev) localStorage.setItem('hith_events',JSON.stringify(events));
+  notifs=JSON.parse(localStorage.getItem('hith_notifs')||'[]');
+  contacts=JSON.parse(localStorage.getItem('hith_contacts')||'[]');
+  if(window.BroadcastChannel) bc=new BroadcastChannel('hith-edu');
+  if(FBCFG.apiKey) tryFB();
+  // Auto-select today's month if present, else first month
+  const nowKey=new Date().toISOString().slice(0,7);
+  const mi=deriveMonths().findIndex(m=>m.k===nowKey);
+  curMo=mi!==-1?mi:0;
+  renderTabs(); renderMo(curMo);
+}
+
+/* ===== TABS ===== */
+function renderTabs(){
+  MONTHS=deriveMonths();
+  const all=MONTHS;
+  if(!all.length){document.getElementById('mtabs').innerHTML='';return;}
+  // Clamp curMo
+  if(curMo>=all.length) curMo=all.length-1;
+  // Slide the 5-tab window so curMo is always visible
+  if(curMo<tabOffset) tabOffset=curMo;
+  if(curMo>=tabOffset+5) tabOffset=curMo-4;
+  tabOffset=Math.max(0,Math.min(tabOffset,Math.max(0,all.length-5)));
+  const hasPrev=tabOffset>0, hasNext=tabOffset+5<all.length;
+  const vis=all.slice(tabOffset,tabOffset+5);
+  // Build dynamic grid columns: optional 28px nav | 1fr per tab | optional 28px nav
+  const cols=[hasPrev?'28px':null,...vis.map(()=>'1fr'),hasNext?'28px':null].filter(Boolean).join(' ');
+  const el=document.getElementById('mtabs');
+  el.style.gridTemplateColumns=cols;
+  el.innerHTML=
+    (hasPrev?`<button class="mtab-nav" onclick="shiftTabs(-1)">◀</button>`:'')+
+    vis.map((m,i)=>{
+      const ri=tabOffset+i;
+      return `<button class="mtab${ri===curMo?' on':''}" onclick="switchMo(${ri})">${m.short}</button>`;
+    }).join('')+
+    (hasNext?`<button class="mtab-nav" onclick="shiftTabs(1)">▶</button>`:'');
+}
+function shiftTabs(dir){tabOffset=Math.max(0,tabOffset+dir);renderTabs();}
+function switchMo(i){curMo=i;renderTabs();renderMo(i);}
+
+/* ===== RENDER MONTH ===== */
+const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+function renderMo(i){
+  const m=MONTHS[i];
+  const mes=events.filter(e=>{const d=new Date(e.date+'T00:00:00');return d.getFullYear()===m.yr&&d.getMonth()+1===m.mo;}).sort((a,b)=>a.date.localeCompare(b.date));
+  document.getElementById('main').innerHTML=`
+    <div class="theme-banner">
+      <div class="tb-mo">${m.label}</div>
+      <div class="tb-theme">🎯 ${m.theme}</div>
+      ${m.ctx?`<div class="tb-ctx">📅 ${m.ctx}</div>`:''}
+    </div>
+    <div class="sec-hdr"><div class="sec-title">Sessions this month</div><div class="sec-ct">${mes.length}</div></div>
+    <div class="ev-list">${mes.length?mes.map(evCard).join(''):'<div class="empty"><div class="empty-icon">📅</div><div>No sessions scheduled — tap <strong>+</strong> to add one.</div></div>'}</div>
+  `;
+}
+function evCard(ev){
+  const d=new Date(ev.date+'T00:00:00');
+  const ds=d.toLocaleDateString('en-AU',{day:'2-digit',month:'short'});
+  return `<div class="ev ${ev.type}${ev.cancelled?' cancelled':''}">
+    <div class="ev-body">
+      <div class="ev-meta">
+        <span class="dpill">${ds}</span>
+        <span class="daypill">${DAYS[d.getDay()]}</span>
+        <span class="tpill">${ev.time}</span>
+        ${ev.cancelled?'<span class="cancelled-tag">CANCELLED</span>':''}
+      </div>
+      <div class="ev-topic">${ev.topic}</div>
+      <div class="ev-series">${ev.series}</div>
+      <div class="ev-nsqhs">${ev.nsqhs}</div>
+      ${ev.loc?`<div class="ev-extra">📍 ${ev.loc}</div>`:''}
+      ${ev.notes?`<div class="ev-extra" style="font-style:italic;">${ev.notes}</div>`:''}
+    </div>
+    <div class="ev-actions">
+      <button class="bsm edit" onclick="openEdit('${ev.id}')">✏️ Edit</button>
+      <button class="bsm canc" onclick="togCancel('${ev.id}')">${ev.cancelled?'↩️ Restore':'⊘ Cancel'}</button>
+      <button class="bsm del" onclick="delEv('${ev.id}')">🗑 Delete</button>
+    </div>
+  </div>`;
+}
+
+/* ===== ADD/EDIT ===== */
+function openAddModal(){
+  document.getElementById('evModalTitle').textContent='Add Session';
+  document.getElementById('editId').value='';
+  document.getElementById('evDate').value=new Date().toISOString().slice(0,10);
+  document.getElementById('evTs').value='15:00'; document.getElementById('evTe').value='15:30';
+  ['evTopic','evSeries','evNsqhs','evNotes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('evLocSel').value='';
+  document.getElementById('evLocOther').value='';
+  document.getElementById('evLocOther').style.display='none';
+  document.getElementById('delEvBtn').classList.add('hidden');
+  document.querySelectorAll('.tchip').forEach(c=>c.classList.remove('sel'));
+  document.querySelector('.tchip[data-t="mandatory"]').classList.add('sel');
+  curType='mandatory';
+  openModal('evModal');
+}
+function openEdit(id){
+  const ev=events.find(e=>e.id===id); if(!ev) return;
+  document.getElementById('evModalTitle').textContent='Edit Session';
+  document.getElementById('editId').value=id;
+  document.getElementById('evDate').value=ev.date;
+  const [ts,te]=(ev.time||'15:00–15:30').split('–');
+  document.getElementById('evTs').value=ts.trim(); document.getElementById('evTe').value=(te||'15:30').trim();
+  document.getElementById('evTopic').value=ev.topic;
+  document.getElementById('evSeries').value=ev.series;
+  document.getElementById('evNsqhs').value=ev.nsqhs;
+  const locVal=ev.loc||'';
+  const locSel=document.getElementById('evLocSel');
+  const locOther=document.getElementById('evLocOther');
+  if(LOC_PRESETS.includes(locVal)){
+    locSel.value=locVal; locOther.style.display='none'; locOther.value='';
+  } else if(locVal){
+    locSel.value='__other__'; locOther.style.display='block'; locOther.value=locVal;
+  } else {
+    locSel.value=''; locOther.style.display='none'; locOther.value='';
+  }
+  document.getElementById('evNotes').value=ev.notes||'';
+  document.getElementById('delEvBtn').classList.remove('hidden');
+  document.querySelectorAll('.tchip').forEach(c=>c.classList.remove('sel'));
+  const chip=document.querySelector(`.tchip[data-t="${ev.type}"]`);
+  if(chip){chip.classList.add('sel');} curType=ev.type;
+  openModal('evModal');
+}
+function handleLocSel(){
+  const v=document.getElementById('evLocSel').value;
+  const other=document.getElementById('evLocOther');
+  other.style.display=v==='__other__'?'block':'none';
+  if(v!=='__other__') other.value='';
+}
+function selType(el){
+  document.querySelectorAll('.tchip').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel'); curType=el.dataset.t;
+}
+function saveEvent(){
+  const id=document.getElementById('editId').value;
+  const date=document.getElementById('evDate').value;
+  const topic=document.getElementById('evTopic').value.trim();
+  const locSel=document.getElementById('evLocSel').value;
+  const locOther=document.getElementById('evLocOther').value.trim();
+  const loc=locSel==='__other__'?locOther:locSel;
+  if(!date||!topic||!loc){toast('Please fill in Date, Topic and Location');return;}
+  const data={
+    id:id||'e'+Date.now(), date, topic,
+    series:document.getElementById('evSeries').value.trim(),
+    nsqhs:document.getElementById('evNsqhs').value.trim(),
+    type:curType,
+    time:document.getElementById('evTs').value+'–'+document.getElementById('evTe').value,
+    loc,
+    notes:document.getElementById('evNotes').value.trim(),
+    cancelled:false,
+  };
+  if(id){const i=events.findIndex(e=>e.id===id);if(i!==-1){data.cancelled=events[i].cancelled;events[i]=data;}}
+  else{events.push(data);}
+  save(); closeModal('evModal');
+  // Re-derive so any brand-new month appears; navigate straight to the saved event's month
+  MONTHS=deriveMonths();
+  const newMi=MONTHS.findIndex(m=>m.k===date.slice(0,7));
+  if(newMi!==-1) curMo=newMi;
+  renderTabs(); renderMo(curMo); toast(id?'Session updated ✓':'Session added ✓');
+}
+function deleteEvFromModal(){
+  const id=document.getElementById('editId').value; if(!id) return;
+  if(!confirm('Delete this session?')) return;
+  events=events.filter(e=>e.id!==id); save(); closeModal('evModal'); renderMo(curMo); toast('Session deleted');
+}
+function delEv(id){
+  if(!confirm('Delete this session?')) return;
+  events=events.filter(e=>e.id!==id); save(); renderMo(curMo); toast('Session deleted');
+}
+function togCancel(id){
+  const ev=events.find(e=>e.id===id); if(!ev) return;
+  ev.cancelled=!ev.cancelled; save(); renderMo(curMo);
+  toast(ev.cancelled?'Session marked cancelled':'Session restored');
+}
+
+/* ===== SAVE/BROADCAST ===== */
+function save(){
+  localStorage.setItem('hith_events',JSON.stringify(events));
+  if(bc) bc.postMessage({type:'events',events});
+  if(fbDB) fbSync();
+}
+function saveNotifs(){
+  localStorage.setItem('hith_notifs',JSON.stringify(notifs));
+  if(bc) bc.postMessage({type:'notifs',notifs});
+  if(fbDB) fbSyncNotifs();
+}
+function saveContacts(){
+  localStorage.setItem('hith_contacts',JSON.stringify(contacts));
+  if(fbDB) fbSyncContacts();
+}
+
+/* ===== ALERT MODAL ===== */
+function openAlertModal(){
+  document.getElementById('nTitle').value=''; document.getElementById('nMsg').value='';
+  alertTab('compose'); openModal('alertModal');
+}
+function alertTab(t){
+  ['compose','contacts','log'].forEach(p=>{
+    document.getElementById('pane-'+p).classList.toggle('hidden',p!==t);
+    document.getElementById('tab-'+p).classList.toggle('on',p===t);
+  });
+  if(t==='log') renderLog();
+  if(t==='contacts') renderContactsTab();
+}
+function selNType(btn){
+  document.querySelectorAll('.nt').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel'); curNType=btn.dataset.nt;
+}
+function togDel(el,key){
+  el.classList.toggle('on'); delivery[key]=el.classList.contains('on');
+  el.querySelector('.dchk').textContent=delivery[key]?'✓':'';
+  document.getElementById('emailSection').classList.toggle('hidden',!delivery.email);
+  const smsSection=document.getElementById('smsSection');
+  smsSection.classList.toggle('hidden',!delivery.sms);
+  if(delivery.sms) renderSmsContactPicker();
+}
+function sendAlert(){
+  const title=document.getElementById('nTitle').value.trim();
+  const msg=document.getElementById('nMsg').value.trim();
+  if(!title||!msg){toast('Fill in Title and Message');return;}
+  const n={id:'n'+Date.now(),ts:new Date().toISOString(),type:curNType,title,message:msg,delivery:{...delivery},read:false};
+  notifs.unshift(n); saveNotifs();
+  if(delivery.browser){
+    if(Notification.permission==='granted') new Notification('HITH Education Hub — '+title,{body:msg});
+    else if(Notification.permission!=='denied') Notification.requestPermission().then(p=>{if(p==='granted') new Notification('HITH Education Hub — '+title,{body:msg});});
+  }
+  if(delivery.email&&EJSCFG.serviceId) doEmailJS(title,msg);
+  if(delivery.sms){
+    const sel=getSelectedContacts();
+    if(sel.length){
+      // Open SMS app — done via separate button; just record it was sent
+      openSmsApp(title,msg,sel);
+    } else {
+      // No contacts saved/selected — fall back to clipboard copy
+      const txt=`HITH Education Hub — ${title}\n\n${msg}`;
+      navigator.clipboard&&navigator.clipboard.writeText(txt).then(()=>setTimeout(()=>toast('No contacts selected — message copied 📋'),400));
+    }
+  }
+  closeModal('alertModal'); toast('Alert sent ✓');
+}
+function renderLog(){
+  const el=document.getElementById('logContent');
+  if(!notifs.length){el.innerHTML='<div class="empty"><div class="empty-icon">📭</div>No alerts sent yet.</div>';return;}
+  el.innerHTML=notifs.map(n=>{
+    const d=new Date(n.ts); const ds=d.toLocaleDateString('en-AU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+    const via=Object.entries(n.delivery).filter(([,v])=>v).map(([k])=>({inapp:'In-App',browser:'Browser',email:'Email',sms:'SMS'}[k])).join(' · ');
+    return `<div class="nlog ${n.type===('alert')||n.type==='alert'?'alert-t':n.type==='urgent'?'urgent-t':''}" style="${n.type==='alert'?'border-left-color:var(--amber);background:var(--amber-bg);':n.type==='urgent'?'border-left-color:var(--red);background:var(--red-bg);':''}">
+      <div class="nlog-time">${ds}</div>
+      <div class="nlog-title">${n.title}</div>
+      <div class="nlog-msg">${n.message}</div>
+      <div class="nlog-via">Via: ${via}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ===== SETTINGS ===== */
+function openSettings(){
+  if(FBCFG.apiKey){
+    ['api','auth','db','proj'].forEach(k=>{ const el=document.getElementById('fb-'+k); if(el) el.value=FBCFG[{api:'apiKey',auth:'authDomain',db:'databaseURL',proj:'projectId'}[k]]||''; });
+  }
+  if(EJSCFG.serviceId){
+    document.getElementById('ejs-svc').value=EJSCFG.serviceId||'';
+    document.getElementById('ejs-tpl').value=EJSCFG.templateId||'';
+    document.getElementById('ejs-key').value=EJSCFG.publicKey||'';
+  }
+  settTab('fb'); openModal('settingsModal');
+}
+function settTab(t){
+  ['fb','ejs','data'].forEach(p=>{
+    document.getElementById('sp-'+p).classList.toggle('hidden',p!==t);
+    document.getElementById('st-'+p).classList.toggle('on',p===t);
+  });
+}
+function saveFB(){
+  FBCFG={apiKey:document.getElementById('fb-api').value.trim(),authDomain:document.getElementById('fb-auth').value.trim(),databaseURL:document.getElementById('fb-db').value.trim(),projectId:document.getElementById('fb-proj').value.trim()};
+  localStorage.setItem('hith_fb',JSON.stringify(FBCFG));
+  if(FBCFG.apiKey) tryFB();
+  closeModal('settingsModal'); toast('Firebase config saved ✓');
+}
+function saveEJS(){
+  EJSCFG={serviceId:document.getElementById('ejs-svc').value.trim(),templateId:document.getElementById('ejs-tpl').value.trim(),publicKey:document.getElementById('ejs-key').value.trim()};
+  localStorage.setItem('hith_ejs',JSON.stringify(EJSCFG));
+  closeModal('settingsModal'); toast('EmailJS config saved ✓');
+}
+function exportData(){
+  const blob=new Blob([JSON.stringify({events,notifs,exported:new Date().toISOString()},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='hith-edu-data-'+new Date().toISOString().slice(0,10)+'.json';a.click();
+}
+function resetSeed(){if(!confirm('Reset to default calendar? All changes will be overwritten.'))return;events=[...SEED];save();renderMo(curMo);closeModal('settingsModal');toast('Calendar reset ✓');}
+function clearAll(){if(!confirm('Clear all data? This cannot be undone.'))return;events=[];notifs=[];localStorage.removeItem('hith_events');localStorage.removeItem('hith_notifs');if(bc)bc.postMessage({type:'events',events:[]});renderMo(curMo);closeModal('settingsModal');toast('All data cleared');}
+
+/* ===== FIREBASE ===== */
+function tryFB(){
+  try{
+    if(!firebase.apps.length) firebase.initializeApp(FBCFG);
+    fbDB=firebase.database();
+
+    // ── Events ──────────────────────────────────────────────
+    fbDB.ref('hith/events').on('value', snap=>{
+      if(pendingEvWrite) return; // ignore echo of our own write
+      const v=snap.val();
+      if(v && Object.keys(v).length){
+        // Firebase has data — sync into local state and re-render
+        events=Object.values(v).sort((a,b)=>a.date.localeCompare(b.date));
+        localStorage.setItem('hith_events',JSON.stringify(events));
+        MONTHS=deriveMonths();
+        // Keep curMo pointing at the same calendar month if possible
+        if(curMo>=MONTHS.length) curMo=Math.max(0,MONTHS.length-1);
+        renderTabs();
+        renderMo(curMo);
+      } else {
+        // Firebase node is empty — push whatever we have locally up to it
+        if(events.length) fbSync();
+      }
+    }, err=>{
+      toast('⚠️ Firebase read error: '+err.message);
+      console.error('Firebase read:',err);
+    });
+
+    // ── Notifications ────────────────────────────────────────
+    fbDB.ref('hith/notifs').on('value', snap=>{
+      if(pendingNotifWrite) return; // ignore echo of our own write
+      const v=snap.val();
+      if(v && Object.keys(v).length){
+        notifs=Object.values(v).sort((a,b)=>b.ts.localeCompare(a.ts));
+        localStorage.setItem('hith_notifs',JSON.stringify(notifs));
+        // Refresh log panel if it's currently visible
+        const logPane=document.getElementById('pane-log');
+        if(logPane && !logPane.classList.contains('hidden')) renderLog();
+      }
+    }, err=>{
+      toast('⚠️ Firebase notif error: '+err.message);
+      console.error('Firebase notifs:',err);
+    });
+
+    // ── Contacts ─────────────────────────────────────────────
+    fbDB.ref('hith/contacts').on('value', snap=>{
+      if(pendingCtWrite) return;
+      const v=snap.val();
+      if(v && Object.keys(v).length){
+        contacts=Object.values(v).sort((a,b)=>a.name.localeCompare(b.name));
+        localStorage.setItem('hith_contacts',JSON.stringify(contacts));
+        // Refresh contacts tab if open
+        const ct=document.getElementById('pane-contacts');
+        if(ct && !ct.classList.contains('hidden')) renderContactsTab();
+      }
+    }, err=>console.warn('Firebase contacts:',err));
+
+    toast('Firebase connected ✓');
+  } catch(e){
+    toast('⚠️ Firebase init failed — check config ⚙️');
+    console.error('Firebase init:',e);
+    fbDB=null; // ensure fbDB stays null so local-only mode works
+  }
+}
+
+function fbSync(){
+  if(!fbDB) return;
+  pendingEvWrite=true;
+  const o={};
+  events.forEach(e=>o[e.id]=e);
+  fbDB.ref('hith/events').set(o)
+    .then(()=>{ pendingEvWrite=false; })
+    .catch(e=>{
+      pendingEvWrite=false;
+      toast('⚠️ Event sync failed — check Firebase rules: '+e.message);
+      console.error('fbSync:',e);
+    });
+}
+
+function fbSyncNotifs(){
+  if(!fbDB) return;
+  pendingNotifWrite=true;
+  const o={};
+  notifs.forEach(n=>o[n.id]=n);
+  fbDB.ref('hith/notifs').set(o)
+    .then(()=>{ pendingNotifWrite=false; })
+    .catch(e=>{
+      pendingNotifWrite=false;
+      toast('⚠️ Alert sync failed — check Firebase rules: '+e.message);
+      console.error('fbSyncNotifs:',e);
+    });
+}
+
+function fbSyncContacts(){
+  if(!fbDB) return;
+  pendingCtWrite=true;
+  const o={};
+  contacts.forEach(c=>o[c.id]=c);
+  fbDB.ref('hith/contacts').set(o)
+    .then(()=>{ pendingCtWrite=false; })
+    .catch(e=>{ pendingCtWrite=false; console.warn('fbSyncContacts:',e); });
+}
+
+/* ===== CONTACTS ===== */
+function renderContactsTab(){
+  const el=document.getElementById('contactList');
+  if(!contacts.length){
+    el.innerHTML='<div class="empty" style="padding:24px 0;"><div class="empty-icon">👥</div><div>No contacts yet.<br><span style="font-size:12px;">Add staff mobile numbers above.</span></div></div>';
+    return;
+  }
+  el.innerHTML=contacts.map(c=>`
+    <div class="ct-item" id="ct-${c.id}">
+      <div class="ct-info">
+        <div class="ct-name">📱 ${c.name}</div>
+        <div class="ct-mobile">${c.mobile}</div>
+      </div>
+      <div class="ct-btns">
+        <button class="cbtn edit" onclick="startEditContact('${c.id}')">✏️ Edit</button>
+        <button class="cbtn del" onclick="deleteContact('${c.id}')">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+function saveContact(){
+  const name=document.getElementById('ctName').value.trim();
+  const mobile=document.getElementById('ctMobile').value.trim();
+  if(!name||!mobile){toast('Enter name and mobile number');return;}
+  if(!validateMobile(mobile)){toast('Enter a valid mobile number (04XX XXX XXX or +614XX…)');return;}
+  if(editingContactId){
+    const c=contacts.find(x=>x.id===editingContactId);
+    if(c){c.name=name;c.mobile=mobile;}
+    cancelEditContact();
+  } else {
+    contacts.push({id:'c'+Date.now(),name,mobile});
+    document.getElementById('ctName').value='';
+    document.getElementById('ctMobile').value='';
+  }
+  saveContacts();
+  renderContactsTab();
+  toast('Contact saved ✓');
+}
+
+function startEditContact(id){
+  const c=contacts.find(x=>x.id===id); if(!c) return;
+  editingContactId=id;
+  document.getElementById('ctName').value=c.name;
+  document.getElementById('ctMobile').value=c.mobile;
+  document.getElementById('ctFormLabel').textContent='Edit Contact';
+  document.getElementById('ctSaveBtn').textContent='Update';
+  document.getElementById('ctSaveBtn').classList.add('update');
+  document.getElementById('ctCancelBtn').classList.remove('hidden');
+  document.getElementById('ctName').focus();
+}
+
+function cancelEditContact(){
+  editingContactId=null;
+  document.getElementById('ctName').value='';
+  document.getElementById('ctMobile').value='';
+  document.getElementById('ctEditId').value='';
+  document.getElementById('ctFormLabel').textContent='Add Staff Contact';
+  document.getElementById('ctSaveBtn').textContent='+ Add';
+  document.getElementById('ctSaveBtn').classList.remove('update');
+  document.getElementById('ctCancelBtn').classList.add('hidden');
+}
+
+function deleteContact(id){
+  if(!confirm('Remove this contact?')) return;
+  contacts=contacts.filter(c=>c.id!==id);
+  saveContacts();
+  renderContactsTab();
+  renderSmsContactPicker();
+  toast('Contact removed');
+}
+
+function validateMobile(n){
+  const clean=n.replace(/[\s\-()]/g,'');
+  return /^(04\d{8}|\+614\d{8}|614\d{8})$/.test(clean);
+}
+
+/* ===== SMS ===== */
+function renderSmsContactPicker(){
+  const el=document.getElementById('smsContactPicker');
+  if(!contacts.length){
+    el.innerHTML='<div style="font-size:13px;color:var(--muted);font-style:italic;padding:8px 0;">No contacts saved. Go to the 👥 Contacts tab to add staff numbers.</div>';
+    return;
+  }
+  el.innerHTML=contacts.map(c=>`
+    <div class="sms-pick-item checked" id="sms-pick-${c.id}" onclick="toggleSmsPick(this)">
+      <div class="sms-pick-chk">✓</div>
+      <div>
+        <div class="sms-pick-name">${c.name}</div>
+        <div class="sms-pick-num">${c.mobile}</div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleSmsPick(el){
+  el.classList.toggle('checked');
+  el.querySelector('.sms-pick-chk').textContent=el.classList.contains('checked')?'✓':'';
+}
+
+function smsSelectAll(val){
+  document.querySelectorAll('.sms-pick-item').forEach(el=>{
+    el.classList.toggle('checked',val);
+    el.querySelector('.sms-pick-chk').textContent=val?'✓':'';
+  });
+}
+
+function getSelectedContacts(){
+  return contacts.filter(c=>{
+    const el=document.getElementById('sms-pick-'+c.id);
+    return el&&el.classList.contains('checked');
+  });
+}
+
+function formatMobile(n){
+  const clean=n.replace(/[\s\-()]/g,'');
+  if(clean.startsWith('0')) return '+61'+clean.slice(1);
+  if(clean.startsWith('+')) return clean;
+  return '+61'+clean;
+}
+
+function openSmsApp(title,msg,sel){
+  if(!sel) sel=getSelectedContacts();
+  if(!sel.length){toast('Select at least one recipient');return;}
+  const title2=title||document.getElementById('nTitle').value.trim();
+  const msg2=msg||document.getElementById('nMsg').value.trim();
+  const numbers=sel.map(c=>formatMobile(c.mobile)).join(',');
+  const bodyText=`HITH Education Hub — ${title2}\n\n${msg2}`;
+
+  // iOS cannot pre-fill BOTH multiple recipients AND body in the sms: URI.
+  // For single recipient: full pre-fill works on all platforms.
+  // For multiple on iOS: pre-fill numbers only, copy body to clipboard.
+  const isIOS=/iP(ad|hone|od)/.test(navigator.userAgent)||
+               (navigator.userAgent.includes('Mac')&&'ontouchend' in document);
+
+  const doOpen=(href)=>{
+    const a=document.createElement('a');
+    a.href=href; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  };
+
+  if(sel.length===1){
+    // Single recipient — body pre-fills on all platforms
+    doOpen(`sms:${numbers}?body=${encodeURIComponent(bodyText)}`);
+    toast('Opening Messages… 📱');
+  } else if(isIOS){
+    // Multiple recipients on iOS — copy body, open with numbers only
+    const copy=navigator.clipboard
+      ?navigator.clipboard.writeText(bodyText)
+      :Promise.resolve(fallbackCopy(bodyText));
+    copy.then(()=>{
+      doOpen(`sms:${numbers}`);
+      toast('Recipients pre-filled — paste message from clipboard 📋');
+    }).catch(()=>{ doOpen(`sms:${numbers}`); });
+  } else {
+    // Android / desktop — numbers + body both supported
+    doOpen(`sms:${numbers}?body=${encodeURIComponent(bodyText)}`);
+    toast('Opening SMS app… 📱');
+  }
+}
+
+function fallbackCopy(text){
+  const ta=document.createElement('textarea');
+  ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{document.execCommand('copy');}catch(e){}
+  document.body.removeChild(ta);
+}
+
+function copySmsText(){
+  const title=document.getElementById('nTitle').value.trim();
+  const msg=document.getElementById('nMsg').value.trim();
+  const txt=`HITH Education Hub — ${title||'Alert'}\n\n${msg||'(no message)'}`;
+  navigator.clipboard&&navigator.clipboard.writeText(txt).then(()=>toast('Message copied to clipboard 📋'));
+}
+
+/* ===== EMAIL JS ===== */
+function doEmailJS(title,msg){
+  const load=()=>{emailjs.init(EJSCFG.publicKey);emailjs.send(EJSCFG.serviceId,EJSCFG.templateId,{subject:'HITH Education Hub — '+title,message:msg,to_email:document.getElementById('emailRecips')?.value||''}).catch(console.warn);};
+  if(window.emailjs){load();}else{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';s.onload=load;document.head.appendChild(s);}
+}
+
+/* ===== MODAL HELPERS ===== */
+function openModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';}
+function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
+function ovClick(e,id){if(e.target.classList.contains('ov')) closeModal(id);}
+
+/* ===== TOAST ===== */
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
+
+init();
+</script>
+</body>
+</html>

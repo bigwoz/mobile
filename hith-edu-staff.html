@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>HITH Education Hub</title>
+<!-- Firebase — same project as admin app -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+:root{
+  --navy:#0D2D5E;--navy-mid:#164080;--blue:#1A6FAF;--blue-lt:#E5F0FA;
+  --bg:#EEF2F7;--surface:#FFFFFF;
+  --amber:#C97A00;--amber-bg:#FFFBEB;--amber-bd:#FDE68A;
+  --red:#C91B1B;--red-bg:#FEF2F2;--red-bd:#FEB4B4;
+  --green:#14803D;--green-bg:#F0FDF4;--green-bd:#A7F3C3;
+  --purple:#7C3AED;--purple-bg:#EDE9FE;
+  --teal:#0891B2;--teal-bg:#E0F2FE;
+  --muted:#6B7280;--border:#DDE3EC;--text:#1B2333;
+  --r:13px;--r-sm:8px;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ── HEADER ─────────────────────────────────────── */
+.app-header{position:sticky;top:0;z-index:100;background:var(--navy);padding:12px 16px 0;}
+.hdr-top{display:flex;align-items:flex-start;justify-content:space-between;padding-bottom:10px;}
+.eyebrow{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.5);}
+.app-name{font-size:19px;font-weight:800;color:#fff;line-height:1.1;}
+.app-sub{font-size:12px;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:6px;margin-top:2px;}
+.pill{background:rgba(255,255,255,.15);color:rgba(255,255,255,.9);font-size:10px;font-weight:700;letter-spacing:.05em;padding:3px 8px;border-radius:20px;text-transform:uppercase;}
+.sync-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--muted);vertical-align:middle;margin-left:2px;transition:background .4s;}
+.sync-dot.live{background:#34D399;animation:pulse 2.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+.hdr-right{display:flex;gap:8px;align-items:center;flex-shrink:0;margin-left:8px;}
+.icon-btn{background:rgba(255,255,255,.12);border:none;border-radius:var(--r-sm);width:40px;height:40px;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;}
+.bell-badge{position:absolute;top:-5px;right:-5px;background:var(--red);color:#fff;font-size:10px;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 3px;border:2px solid var(--navy);}
+.bell-badge.gone{display:none;}
+
+/* ── MONTH TABS ──────────────────────────────────── */
+.mtabs{display:grid;grid-template-columns:repeat(5,1fr);}
+.mtab{background:transparent;border:none;color:rgba(255,255,255,.5);font-size:12px;font-weight:600;padding:9px 4px;cursor:pointer;border-bottom:3px solid transparent;text-align:center;font-family:inherit;transition:all .15s;}
+.mtab.on{color:#fff;border-bottom-color:#fff;background:rgba(255,255,255,.08);}
+
+/* ── MAIN ────────────────────────────────────────── */
+.main{padding:16px;padding-bottom:80px;}
+
+/* ── COMING UP NEXT (global next 5 events) ───────── */
+.next-up-section{margin-bottom:18px;}
+.section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px;}
+.up-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.up-scroll::-webkit-scrollbar{display:none;}
+.up-card{background:var(--surface);border-radius:var(--r-sm);padding:10px 12px;min-width:170px;max-width:200px;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.06);border-top:3px solid var(--blue);cursor:pointer;transition:box-shadow .15s;}
+.up-card:hover{box-shadow:0 3px 8px rgba(0,0,0,.1);}
+.up-card.mandatory{border-top-color:#C91B1B;}
+.up-card.cns{border-top-color:#7C3AED;}
+.up-card.cvad{border-top-color:#0D2D5E;}
+.up-card.diabetes{border-top-color:#14803D;}
+.up-card.wound{border-top-color:#C97A00;}
+.up-card.journal{border-top-color:#0891B2;}
+.up-card.vascular{border-top-color:#1A6FAF;}
+.up-card.flexi{border-top-color:#6B7280;}
+.up-card.cancelled{opacity:.45;text-decoration:line-through;}
+.up-days{font-size:10px;font-weight:700;color:var(--blue);margin-bottom:3px;}
+.up-date{font-size:11px;font-weight:700;color:var(--muted);}
+.up-topic{font-size:13px;font-weight:700;line-height:1.3;margin:3px 0;}
+.up-time{font-size:11px;color:var(--blue);font-weight:600;}
+.no-next{font-size:13px;color:var(--muted);font-style:italic;padding:4px 0 10px;}
+
+/* ── THEME BANNER ───────────────────────────────── */
+.theme-banner{background:linear-gradient(135deg,var(--navy-mid),var(--blue));border-radius:var(--r);padding:13px 16px;margin-bottom:14px;color:#fff;}
+.tb-mo{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.65;}
+.tb-theme{font-size:14px;font-weight:800;margin-top:3px;}
+.tb-ctx{font-size:12px;opacity:.75;margin-top:2px;}
+
+/* ── CALENDAR CARD ──────────────────────────────── */
+.cal-card{background:var(--surface);border-radius:var(--r);box-shadow:0 1px 3px rgba(0,0,0,.06);padding:14px 12px 12px;margin-bottom:14px;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.cal-hd{text-align:center;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;padding:2px 0 7px;}
+.cal-hd.wknd{color:#9CA3AF;}
+.cal-cell{display:flex;flex-direction:column;align-items:center;padding:3px 1px;border-radius:8px;cursor:pointer;min-height:42px;transition:background .12s;-webkit-tap-highlight-color:transparent;}
+.cal-cell:active{background:var(--bg);}
+.cal-cell.empty{cursor:default;pointer-events:none;}
+.cal-cell.wknd .cal-num{color:#9CA3AF;}
+.cal-num{font-size:13px;font-weight:600;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;margin-bottom:3px;transition:all .12s;}
+.cal-num.today{background:var(--navy);color:#fff;font-weight:800;}
+.cal-num.sel{background:var(--blue);color:#fff;font-weight:800;}
+.cal-dots{display:flex;gap:2px;flex-wrap:wrap;justify-content:center;max-width:28px;}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.dot.mandatory{background:#C91B1B;}
+.dot.cns{background:#7C3AED;}
+.dot.cvad{background:#0D2D5E;}
+.dot.diabetes{background:#14803D;}
+.dot.wound{background:#C97A00;}
+.dot.journal{background:#0891B2;}
+.dot.vascular{background:#1A6FAF;}
+.dot.flexi{background:#6B7280;}
+.dot-more{font-size:8px;color:var(--muted);font-weight:700;line-height:1;align-self:center;}
+
+/* LEGEND */
+.legend{display:flex;gap:8px;flex-wrap:wrap;padding-top:12px;margin-top:10px;border-top:1px solid var(--border);}
+.leg{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);}
+.leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* ── DAY EVENTS SECTION ─────────────────────────── */
+.day-section{margin-bottom:16px;}
+.day-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.day-hdr-left{font-size:15px;font-weight:700;color:var(--navy);}
+.day-clear{background:none;border:none;font-size:12px;color:var(--muted);cursor:pointer;font-family:inherit;padding:4px 8px;border-radius:var(--r-sm);}
+
+/* ── EVENT CARDS (staff view) ───────────────────── */
+.ev-card{background:var(--surface);border-radius:var(--r);box-shadow:0 1px 3px rgba(0,0,0,.06);border-left:4px solid var(--blue);overflow:hidden;cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent;}
+.ev-card:active{opacity:.85;}
+.ev-card.mandatory{border-left-color:#C91B1B;}
+.ev-card.cns{border-left-color:#7C3AED;}
+.ev-card.cvad{border-left-color:#0D2D5E;}
+.ev-card.diabetes{border-left-color:#14803D;}
+.ev-card.wound{border-left-color:#C97A00;}
+.ev-card.journal{border-left-color:#0891B2;}
+.ev-card.vascular{border-left-color:#1A6FAF;}
+.ev-card.flexi{border-left-color:#6B7280;}
+.ev-card.cancelled{opacity:.45;}
+.ev-body{padding:12px 14px;}
+.ev-meta{display:flex;align-items:center;gap:7px;margin-bottom:5px;flex-wrap:wrap;}
+.dpill{background:var(--navy);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;}
+.daypill{font-size:11px;color:var(--muted);font-weight:600;}
+.tpill{font-size:11px;color:var(--blue);background:var(--blue-lt);padding:2px 7px;border-radius:10px;font-weight:600;}
+.canc-tag{font-size:10px;font-weight:700;background:var(--red-bg);color:var(--red);padding:2px 7px;border-radius:10px;}
+.ev-topic{font-size:15px;font-weight:700;margin-bottom:2px;}
+.ev-series{font-size:12px;color:var(--muted);font-style:italic;margin-bottom:4px;}
+.ev-nsqhs{font-size:11px;color:var(--blue);}
+.ev-extra{font-size:12px;color:var(--muted);margin-top:3px;}
+.ev-tap-hint{font-size:11px;color:var(--muted);margin-top:6px;display:flex;align-items:center;gap:4px;}
+
+/* SECTION DIVIDER */
+.month-sec-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:14px 0 8px;}
+
+/* ── NOTIFICATION MODAL ──────────────────────────── */
+.notif-ov{position:fixed;inset:0;background:rgba(0,0,0,.52);z-index:300;display:none;align-items:flex-start;padding-top:0;}
+.notif-ov.open{display:flex;}
+.notif-sheet{background:var(--surface);width:100%;max-height:85vh;overflow-y:auto;padding-bottom:30px;border-radius:0 0 20px 20px;box-shadow:0 10px 40px rgba(0,0,0,.25);}
+.notif-hdr{position:sticky;top:0;background:var(--surface);display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);z-index:1;}
+.notif-title{font-size:17px;font-weight:700;}
+.notif-actions{display:flex;align-items:center;gap:10px;}
+.mark-all{font-size:12px;color:var(--blue);background:none;border:none;cursor:pointer;font-weight:700;font-family:inherit;}
+.notif-close{background:var(--bg);border:none;border-radius:50%;width:30px;height:30px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.notif-body{padding:16px 20px;}
+.notif-item{padding:12px 14px;border-radius:var(--r-sm);margin-bottom:10px;border-left:3px solid var(--blue);background:var(--blue-lt);}
+.notif-item.alert-t{border-left-color:var(--amber);background:var(--amber-bg);}
+.notif-item.urgent-t{border-left-color:var(--red);background:var(--red-bg);}
+.notif-item.unread::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--blue);margin-right:8px;vertical-align:middle;flex-shrink:0;}
+.notif-item.urgent-t.unread::before{background:var(--red);}
+.notif-item.alert-t.unread::before{background:var(--amber);}
+.notif-item.read{opacity:.6;}
+.ni-row{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.ni-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;text-transform:uppercase;letter-spacing:.04em;}
+.ni-badge.info{background:var(--blue-lt);color:var(--blue);}
+.ni-badge.alert{background:var(--amber-bg);color:var(--amber);}
+.ni-badge.urgent{background:var(--red-bg);color:var(--red);}
+.ni-time{font-size:11px;color:var(--muted);}
+.ni-title{font-size:14px;font-weight:700;margin-bottom:3px;}
+.ni-msg{font-size:13px;line-height:1.5;}
+.empty-notif{text-align:center;padding:40px 20px;color:var(--muted);}
+.empty-icon{font-size:36px;margin-bottom:8px;}
+.push-permit-row{background:var(--blue-lt);border-radius:var(--r-sm);padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.push-permit-row p{font-size:13px;flex:1;line-height:1.4;}
+.push-btn{background:var(--blue);color:#fff;border:none;border-radius:var(--r-sm);padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;}
+
+/* ── EVENT DETAIL MODAL ──────────────────────────── */
+.evd-ov{position:fixed;inset:0;background:rgba(0,0,0,.52);z-index:400;display:none;align-items:flex-end;justify-content:center;}
+.evd-ov.open{display:flex;}
+.evd-sheet{background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-height:85vh;overflow-y:auto;padding-bottom:40px;}
+.drag{width:40px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 0;}
+.evd-top{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);}
+.evd-title{font-size:17px;font-weight:700;padding-right:10px;}
+.evd-close{background:var(--bg);border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.evd-body{padding:20px;}
+.type-banner{border-radius:var(--r-sm);padding:10px 14px;margin-bottom:16px;font-size:13px;font-weight:700;}
+.type-banner.mandatory{background:var(--red-bg);color:var(--red);}
+.type-banner.cns{background:var(--purple-bg);color:var(--purple);}
+.type-banner.cvad{background:#E0ECF8;color:var(--navy);}
+.type-banner.diabetes{background:var(--green-bg);color:var(--green);}
+.type-banner.wound{background:var(--amber-bg);color:var(--amber);}
+.type-banner.journal{background:var(--teal-bg);color:var(--teal);}
+.type-banner.vascular{background:var(--blue-lt);color:var(--blue);}
+.type-banner.flexi{background:var(--bg);color:var(--muted);}
+.detail-row{display:flex;align-items:flex-start;gap:12px;margin-bottom:13px;}
+.d-icon{font-size:20px;flex-shrink:0;margin-top:1px;width:26px;text-align:center;}
+.d-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:2px;}
+.d-val{font-size:14px;font-weight:600;line-height:1.4;}
+.d-sub{font-size:12px;color:var(--muted);margin-top:1px;}
+.ib{border-left:3px solid;padding:10px 14px;border-radius:11px;margin-bottom:12px;font-size:13px;line-height:1.5;}
+.ib.b{border-color:var(--blue);background:var(--blue-lt);}
+.ib.a{border-color:var(--amber);background:var(--amber-bg);}
+.ib.r{border-color:var(--red);background:var(--red-bg);}
+.ib strong{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;font-weight:800;}
+
+
+
+/* ── LOCATION ROW (on cards) ─────────────────────── */
+.ev-loc-row{font-size:13px;font-weight:700;color:var(--navy);margin:5px 0 7px;display:flex;align-items:center;gap:5px;}
+.ev-loc-tbc{color:var(--muted);font-weight:400;font-style:italic;}
+.up-loc{font-size:11px;color:var(--muted);margin-top:3px;}
+.up-loc-tbc{font-style:italic;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:700;opacity:0;transition:opacity .3s;white-space:nowrap;pointer-events:none;}
+.toast.show{opacity:1;}
+
+.hidden{display:none!important;}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header class="app-header">
+  <div class="hdr-top">
+    <div>
+      <div class="eyebrow">St Vincent's Hospital Melbourne · HITH / Community Nursing</div>
+      <div class="app-name">Education Hub</div>
+      <div class="app-sub">
+        Staff Portal
+        <span class="pill">2026</span>
+        <span class="sync-dot" id="syncDot" title="Sync status"></span>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <button class="icon-btn" onclick="openNotif()" title="Notifications" aria-label="Notifications">
+        🔔
+        <span class="bell-badge gone" id="bellBadge">0</span>
+      </button>
+
+    </div>
+  </div>
+  <div class="mtabs" id="mtabs"></div>
+</header>
+
+<main class="main" id="main"></main>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════ NOTIFICATION MODAL ═══════════════ -->
+<div class="notif-ov" id="notifOv" onclick="ovClose(event,'notifOv')">
+  <div class="notif-sheet">
+    <div class="notif-hdr">
+      <div class="notif-title">🔔 Notifications</div>
+      <div class="notif-actions">
+        <button class="mark-all" onclick="markAllRead()">Mark all read</button>
+        <button class="notif-close" onclick="closeModal('notifOv')">✕</button>
+      </div>
+    </div>
+    <div class="notif-body" id="notifBody"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ EVENT DETAIL MODAL ═══════════════ -->
+<div class="evd-ov" id="evdOv" onclick="ovClose(event,'evdOv')">
+  <div class="evd-sheet">
+    <div class="drag"></div>
+    <div class="evd-top">
+      <div class="evd-title" id="evdTitle"></div>
+      <button class="evd-close" onclick="closeModal('evdOv')">✕</button>
+    </div>
+    <div class="evd-body" id="evdBody"></div>
+  </div>
+</div>
+
+
+
+<script>
+/* ═══════════════════════════════════════════════════
+   SEED DATA — identical structure to admin app
+   Auto-replaced by Firebase / localStorage data on load
+═══════════════════════════════════════════════════ */
+const MONTHS=[
+  {k:'jul',label:'Jul 2026',mo:7,yr:2026,theme:'Diabetes Care & Vascular Assessment',ctx:'Aligning with National Diabetes Week: 12–19 July'},
+  {k:'aug',label:'Aug 2026',mo:8,yr:2026,theme:'Stroke Care & High-Tech Wound Management',ctx:'Aligning with National Stroke Week: 2–9 Aug'},
+  {k:'sep',label:'Sep 2026',mo:9,yr:2026,theme:'Oncology, Lymphoma & Vascular Protection',ctx:'Aligning with Lymphoma Awareness Month'},
+  {k:'oct',label:'Oct 2026',mo:10,yr:2026,theme:'Mental Health, Cognition & Patient Safety',ctx:'Aligning with National Mental Health Month'},
+  {k:'nov',label:'Nov 2026',mo:11,yr:2026,theme:'Advanced Clinical Skills & Year-End Competencies',ctx:''},
+];
+const SEED=[
+  {id:'e001',date:'2026-07-06',topic:'BLS Annual Update',series:'Mandatory Competency',nsqhs:'NSQHS 8 · NSQHS 1',type:'mandatory',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e002',date:'2026-07-07',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e003',date:'2026-07-09',topic:'Diabetes: Newly Diagnosed Patient Care',series:'Prep for Diabetes Week',nsqhs:'NSQHS 2 · NSQHS 5',type:'diabetes',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e004',date:'2026-07-13',topic:'CVAD Overview',series:'Vascular Access',nsqhs:'NSQHS 5 · NSQHS 3',type:'cvad',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e005',date:'2026-07-14',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e006',date:'2026-07-16',topic:'Diabetes: Sick Day Management',series:'National Diabetes Week',nsqhs:'NSQHS 2 · NSQHS 5',type:'diabetes',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e007',date:'2026-07-20',topic:'BLS Annual Update',series:'Mandatory Competency',nsqhs:'NSQHS 8 · NSQHS 1',type:'mandatory',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e008',date:'2026-07-21',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e009',date:'2026-07-23',topic:'Doppler ABI Measurements',series:'Peripheral Vascular Assessment',nsqhs:'NSQHS 5',type:'vascular',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e010',date:'2026-07-27',topic:'CVAD Alteplase Administration',series:'Vascular Access',nsqhs:'NSQHS 4 · NSQHS 5',type:'cvad',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e011',date:'2026-07-28',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e012',date:'2026-07-30',topic:'Cognitive Assessments',series:'Aged Care / Delirium Screening',nsqhs:'NSQHS 5 · NSQHS 8',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e013',date:'2026-08-03',topic:'BLS Annual Update',series:'Mandatory Competency',nsqhs:'NSQHS 8 · NSQHS 1',type:'mandatory',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e014',date:'2026-08-04',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e015',date:'2026-08-06',topic:'Neurological Assessment & Stroke Triaging',series:'National Stroke Week',nsqhs:'NSQHS 8 · NSQHS 5',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e016',date:'2026-08-07',topic:'Journal Club: Stroke Mimics & Community Care',series:'Evidence-Based Practice',nsqhs:'NSQHS 1',type:'journal',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e017',date:'2026-08-10',topic:'CVAD Dressing & Line Maintenance',series:'Vascular Access',nsqhs:'NSQHS 3 · NSQHS 5',type:'cvad',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e018',date:'2026-08-11',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e019',date:'2026-08-13',topic:'VAC Dressings (NPWT): Setup & Troubleshooting',series:'Wound Care',nsqhs:'NSQHS 5 · NSQHS 3',type:'wound',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e020',date:'2026-08-14',topic:'Clinical Photography Standards for Wounds',series:'Documentation & Governance',nsqhs:'NSQHS 1 · NSQHS 2',type:'wound',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e021',date:'2026-08-17',topic:'BLS Annual Update',series:'Mandatory Competency',nsqhs:'NSQHS 8 · NSQHS 1',type:'mandatory',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e022',date:'2026-08-18',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e023',date:'2026-08-20',topic:'Specific Wound Care Products: Selection Matrix',series:'Wound Care',nsqhs:'NSQHS 5',type:'wound',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e024',date:'2026-08-21',topic:'Case Study: Complex Debridement Pathways',series:'Wound Care',nsqhs:'NSQHS 5',type:'wound',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e025',date:'2026-08-24',topic:'CVAD Overview',series:'Vascular Access',nsqhs:'NSQHS 5 · NSQHS 3',type:'cvad',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e026',date:'2026-08-25',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e027',date:'2026-08-27',topic:'ECG Interpretation: Rhythms & Escalation',series:'Cardiac Assessment',nsqhs:'NSQHS 8 · NSQHS 5',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e028',date:'2026-08-28',topic:'Open Q&A / Competency Sign-off Catch-up',series:'Flexi Session',nsqhs:'NSQHS 1',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e029',date:'2026-08-31',topic:'BLS Annual Update',series:'Mandatory Competency',nsqhs:'NSQHS 8 · NSQHS 1',type:'mandatory',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e030',date:'2026-09-01',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e031',date:'2026-09-03',topic:'TIVAD Access & Gripper Needle Insertion/Removal',series:'Lymphoma Month Anchor',nsqhs:'NSQHS 5 · NSQHS 3',type:'cvad',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e032',date:'2026-09-04',topic:'Lymphoma: Recognition of Red Flags & Symptoms',series:'Lymphoma Month Anchor',nsqhs:'NSQHS 5 · NSQHS 8',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e033',date:'2026-09-07',topic:'CVAD Alteplase Administration',series:'Vascular Access',nsqhs:'NSQHS 4 · NSQHS 5',type:'cvad',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e034',date:'2026-09-08',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e035',date:'2026-09-10',topic:'Journal Club: Sepsis Prevention in Oncology Patients',series:'R U OK? Day Focus',nsqhs:'NSQHS 3 · NSQHS 8',type:'journal',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e036',date:'2026-09-11',topic:'Malignant Wound Management',series:'Oncology / Wound Care',nsqhs:'NSQHS 5',type:'wound',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e037',date:'2026-09-14',topic:'BLS Annual Update',series:'Mandatory Competency',nsqhs:'NSQHS 8 · NSQHS 1',type:'mandatory',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e038',date:'2026-09-15',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e039',date:'2026-09-17',topic:'Compression Bandaging: Principles & Safety',series:'Chronic Oedema Management',nsqhs:'NSQHS 5',type:'wound',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e040',date:'2026-09-18',topic:'Skin Tears: STAR Classification & Dressings',series:'Wound Care',nsqhs:'NSQHS 5',type:'wound',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e041',date:'2026-09-21',topic:'CVAD Dressing & Line Maintenance',series:'Vascular Access',nsqhs:'NSQHS 3 · NSQHS 5',type:'cvad',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e042',date:'2026-09-22',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e043',date:'2026-09-24',topic:'AKI / Managing Patients & Red Flags',series:'Clinical Education',nsqhs:'NSQHS 5 · NSQHS 3',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e044',date:'2026-09-25',topic:'Patient Education Strategies for Home Infusions',series:'Clinical Education',nsqhs:'NSQHS 2 · NSQHS 5',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e045',date:'2026-09-28',topic:'BLS Annual Update',series:'Mandatory Competency',nsqhs:'NSQHS 8 · NSQHS 1',type:'mandatory',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e046',date:'2026-09-29',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e047',date:'2026-10-01',topic:'Cognitive Assessments: Delirium vs. Dementia',series:'Mental Health Month',nsqhs:'NSQHS 5 · NSQHS 8',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e048',date:'2026-10-02',topic:'De-escalation & Communication Strategies',series:'Patient Safety',nsqhs:'NSQHS 8 · NSQHS 2',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e049',date:'2026-10-05',topic:'CVAD Overview',series:'Vascular Access',nsqhs:'NSQHS 5 · NSQHS 3',type:'cvad',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e050',date:'2026-10-06',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e051',date:'2026-10-08',topic:'Wound Care: The TIMERS Framework',series:'Wound Care',nsqhs:'NSQHS 5',type:'wound',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e052',date:'2026-10-09',topic:'Journal Club: Medication Safety in the Home',series:'Evidence-Based Practice',nsqhs:'NSQHS 4 · NSQHS 1',type:'journal',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e053',date:'2026-10-12',topic:'BLS Annual Update',series:'Mandatory Competency',nsqhs:'NSQHS 8 · NSQHS 1',type:'mandatory',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e054',date:'2026-10-13',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e055',date:'2026-10-15',topic:'Diabetes: Flash Glucose Monitoring Devices',series:'Diabetes Care',nsqhs:'NSQHS 5 · NSQHS 2',type:'diabetes',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e056',date:'2026-10-16',topic:'Case Study: Managing Chronic Venous Ulcers',series:'Wound Care',nsqhs:'NSQHS 5',type:'wound',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e057',date:'2026-10-19',topic:'CVAD Alteplase Administration',series:'Vascular Access',nsqhs:'NSQHS 4 · NSQHS 5',type:'cvad',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e058',date:'2026-10-20',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e059',date:'2026-10-22',topic:'ECG Interpretation: Ischaemic Changes',series:'Cardiac Assessment',nsqhs:'NSQHS 8 · NSQHS 5',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e060',date:'2026-10-23',topic:'Medical Device Tracking & Governance',series:'Audit & Quality Assurance',nsqhs:'NSQHS 1',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e061',date:'2026-10-26',topic:'BLS Annual Update',series:'Mandatory Competency',nsqhs:'NSQHS 8 · NSQHS 1',type:'mandatory',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e062',date:'2026-10-27',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e063',date:'2026-10-29',topic:'TIVAD Management: Troubleshooting Patency',series:'Vascular Access',nsqhs:'NSQHS 5 · NSQHS 4',type:'cvad',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e064',date:'2026-10-30',topic:'Open Review / Competency Sign-offs',series:'Flexi Session',nsqhs:'NSQHS 1',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e065',date:'2026-11-02',topic:'CVAD Dressing & Line Maintenance',series:'Vascular Access',nsqhs:'NSQHS 3 · NSQHS 5',type:'cvad',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e066',date:'2026-11-03',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e067',date:'2026-11-05',topic:'VAC Dressings (NPWT): Complex Cavities',series:'Wound Care',nsqhs:'NSQHS 5 · NSQHS 3',type:'wound',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e068',date:'2026-11-06',topic:'Doppler ABI Assessments: Practical Workshop',series:'Skill Refinement',nsqhs:'NSQHS 5',type:'vascular',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e069',date:'2026-11-09',topic:'BLS Annual Update',series:'Mandatory Competency',nsqhs:'NSQHS 8 · NSQHS 1',type:'mandatory',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e070',date:'2026-11-10',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e071',date:'2026-11-12',topic:'Surgical Drains: Troubleshooting & Complications',series:'Post-Operative Care',nsqhs:'NSQHS 5 · NSQHS 3',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e072',date:'2026-11-13',topic:'Journal Club: Antimicrobial Stewardship',series:'Evidence-Based Practice',nsqhs:'NSQHS 3 · NSQHS 4',type:'journal',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e073',date:'2026-11-16',topic:'CVAD Overview',series:'Vascular Access',nsqhs:'NSQHS 5 · NSQHS 3',type:'cvad',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e074',date:'2026-11-17',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e075',date:'2026-11-19',topic:'Compression Bandaging: Multi-layer Systems',series:'Wound Care',nsqhs:'NSQHS 5',type:'wound',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e076',date:'2026-11-20',topic:'Cognitive Assessments in Acute Settings',series:'Assessment Skills',nsqhs:'NSQHS 5 · NSQHS 8',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e077',date:'2026-11-23',topic:'BLS Annual Update',series:'Mandatory Competency',nsqhs:'NSQHS 8 · NSQHS 1',type:'mandatory',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e078',date:'2026-11-24',topic:'CNS Series In-Service',series:'Professional Development',nsqhs:'NSQHS 1',type:'cns',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e079',date:'2026-11-26',topic:'Diabetes Management: Frail & Elderly Patients',series:'Diabetes Care',nsqhs:'NSQHS 5 · NSQHS 2',type:'diabetes',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e080',date:'2026-11-27',topic:'Final Competency Audit & Review',series:'Quality Assurance',nsqhs:'NSQHS 1',type:'flexi',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+  {id:'e081',date:'2026-11-30',topic:'CVAD Alteplase Administration',series:'Vascular Access',nsqhs:'NSQHS 4 · NSQHS 5',type:'cvad',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
+];
+
+/* ═══════════════════════════════════════════════════
+   TYPE METADATA
+═══════════════════════════════════════════════════ */
+const TYPE_META={
+  mandatory:{label:'Mandatory Competency',icon:'🚨'},
+  cns:       {label:'CNS Series In-Service',icon:'📚'},
+  cvad:      {label:'Vascular Access / CVAD',icon:'💉'},
+  diabetes:  {label:'Diabetes Care',icon:'🩸'},
+  wound:     {label:'Wound Care',icon:'🩹'},
+  journal:   {label:'Journal Club',icon:'📖'},
+  vascular:  {label:'Vascular Assessment',icon:'🫀'},
+  flexi:     {label:'Clinical Education / Flexi',icon:'📋'},
+};
+const DAYS_FULL=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const DAYS_SHORT=['Su','Mo','Tu','We','Th','Fr','Sa'];
+
+/* ═══════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════
+   FIREBASE CONFIG — svhm-hith-edu (asia-southeast1)
+═══════════════════════════════════════════════════ */
+const FBCFG = {
+  apiKey:            "AIzaSyBPAtBNlWscIVQRpHbRJoCu1XOgM6MsXb8",
+  authDomain:        "svhm-hith-edu.firebaseapp.com",
+  databaseURL:       "https://svhm-hith-edu-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:         "svhm-hith-edu",
+  storageBucket:     "svhm-hith-edu.firebasestorage.app",
+  messagingSenderId: "116608391017",
+  appId:             "1:116608391017:web:57d85d9c88eaa00dbd8ff8",
+};
+
+let events=[], notifs=[], curMo=0, selDay=null;
+let fbDB=null, bc=null;
+const TODAY=new Date().toISOString().slice(0,10);
+
+/* ═══════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════ */
+function init(){
+  // Load cached data from localStorage (populated by Firebase listener below)
+  const stored=localStorage.getItem('hith_events');
+  events=stored?JSON.parse(stored):[...SEED];
+  notifs=JSON.parse(localStorage.getItem('hith_notifs')||'[]');
+
+  // Auto-select current month tab if within Jul–Nov range
+  const now=new Date();
+  const mi=MONTHS.findIndex(m=>m.yr===now.getFullYear()&&m.mo===now.getMonth()+1);
+  curMo=mi!==-1?mi:0;
+
+  // BroadcastChannel — live updates when admin app open in same browser
+  if(window.BroadcastChannel){
+    bc=new BroadcastChannel('hith-edu');
+    bc.onmessage=e=>{
+      if(e.data.type==='events'){
+        events=e.data.events;
+        localStorage.setItem('hith_events',JSON.stringify(events));
+        renderMo(curMo);
+        showToast('Calendar updated ✓');
+      }
+      if(e.data.type==='notifs'){
+        const prev=notifs.length;
+        notifs=e.data.notifs;
+        localStorage.setItem('hith_notifs',JSON.stringify(notifs));
+        updateBadge();
+        if(notifs.length>prev){
+          const n=notifs[0];
+          showToast('🔔 '+n.title);
+          if(Notification.permission==='granted')
+            new Notification('HITH Education Hub',{body:n.title+': '+n.message});
+        }
+      }
+    };
+  }
+
+  // Firebase — always connect using hardcoded config
+  if(FBCFG.apiKey && !FBCFG.apiKey.startsWith('PASTE_')) tryFB();
+
+  renderTabs();
+  renderMo(curMo);
+  updateBadge();
+}
+
+/* ═══════════════════════════════════════════════════
+   FIREBASE
+═══════════════════════════════════════════════════ */
+function tryFB(){
+  try{
+    if(!firebase.apps.length) firebase.initializeApp(FBCFG);
+    fbDB=firebase.database();
+
+    // Listen for event changes
+    fbDB.ref('hith/events').on('value',snap=>{
+      const v=snap.val();
+      if(v){
+        events=Object.values(v).sort((a,b)=>a.date.localeCompare(b.date));
+        localStorage.setItem('hith_events',JSON.stringify(events));
+        renderMo(curMo);
+      }
+    },()=>setSyncDot(false));
+
+    // Listen for new notifications
+    fbDB.ref('hith/notifs').on('value',snap=>{
+      const v=snap.val();
+      if(v){
+        const incoming=Object.values(v).sort((a,b)=>b.ts.localeCompare(a.ts));
+        const prev=notifs.length;
+        // Preserve local read status
+        const readSet=new Set(notifs.filter(n=>n.read).map(n=>n.id));
+        notifs=incoming.map(n=>({...n,read:readSet.has(n.id)?true:n.read}));
+        localStorage.setItem('hith_notifs',JSON.stringify(notifs));
+        updateBadge();
+        if(notifs.length>prev){
+          const newest=notifs[0];
+          if(!newest.read){
+            showToast('🔔 '+newest.title);
+            if(Notification.permission==='granted')
+              new Notification('HITH Education Hub',{body:newest.title+': '+newest.message});
+          }
+        }
+      }
+    });
+
+    setSyncDot(true);
+    showToast('Firebase connected ✓');
+  }catch(err){
+    console.warn('Firebase error:',err);
+    setSyncDot(false);
+  }
+}
+
+function setSyncDot(live){
+  const d=document.getElementById('syncDot');
+  d.classList.toggle('live',live);
+  d.title=live?'Live sync active':'Sync offline — localStorage only';
+}
+
+/* ═══════════════════════════════════════════════════
+   MONTH TABS
+═══════════════════════════════════════════════════ */
+function renderTabs(){
+  document.getElementById('mtabs').innerHTML=MONTHS.map((m,i)=>
+    `<button class="mtab${i===curMo?' on':''}" onclick="switchMo(${i})">${m.label.slice(0,3)}</button>`
+  ).join('');
+}
+function switchMo(i){
+  curMo=i; selDay=null;
+  renderTabs(); renderMo(i);
+}
+
+/* ═══════════════════════════════════════════════════
+   RENDER MONTH
+═══════════════════════════════════════════════════ */
+function renderMo(i){
+  const m=MONTHS[i];
+  const mes=events.filter(e=>{
+    const d=new Date(e.date+'T00:00:00');
+    return d.getFullYear()===m.yr&&d.getMonth()+1===m.mo;
+  }).sort((a,b)=>a.date.localeCompare(b.date));
+
+  // Next Up: next 5 upcoming events globally (across all months)
+  const upNext=events
+    .filter(e=>e.date>=TODAY&&!e.cancelled)
+    .sort((a,b)=>a.date.localeCompare(b.date))
+    .slice(0,5);
+
+  document.getElementById('main').innerHTML=`
+    ${renderNextUp(upNext)}
+    <div class="theme-banner">
+      <div class="tb-mo">${m.label}</div>
+      <div class="tb-theme">🎯 ${m.theme}</div>
+      ${m.ctx?`<div class="tb-ctx">📅 ${m.ctx}</div>`:''}
+    </div>
+    ${renderCalendar(m.yr,m.mo,mes)}
+    <div id="daySection"></div>
+    <div class="month-sec-label">${mes.length} sessions this month</div>
+    <div id="monthList">${mes.length?mes.map(e=>evCard(e)).join(''):'<p style="color:var(--muted);font-size:13px;font-style:italic;padding:8px 0;">No sessions scheduled for this month.</p>'}</div>
+  `;
+
+  // Re-apply selected day highlight
+  if(selDay) selectDay(selDay,true);
+}
+
+/* ═══════════════════════════════════════════════════
+   COMING UP NEXT STRIP
+═══════════════════════════════════════════════════ */
+function renderNextUp(list){
+  if(!list.length) return '';
+  const cards=list.map(ev=>{
+    const d=new Date(ev.date+'T00:00:00');
+    const ds=d.toLocaleDateString('en-AU',{weekday:'short',day:'2-digit',month:'short'});
+    const daysAway=Math.round((d-new Date(TODAY+'T00:00:00'))/(1000*60*60*24));
+    const daysLabel=daysAway===0?'Today':daysAway===1?'Tomorrow':`In ${daysAway} days`;
+    return `<div class="up-card ${ev.type}" onclick="openEvDetail('${ev.id}')">
+      <div class="up-days">${daysLabel}</div>
+      <div class="up-date">${ds}</div>
+      <div class="up-topic">${ev.topic}</div>
+      <div class="up-time">🕒 ${ev.time}</div>
+      ${ev.loc?`<div class="up-loc">📍 ${ev.loc}</div>`:`<div class="up-loc up-loc-tbc">📍 Location TBC</div>`}
+    </div>`;
+  }).join('');
+  return `<div class="next-up-section">
+    <div class="section-label">📌 Coming Up Next</div>
+    <div class="up-scroll">${cards}</div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════════
+   CALENDAR GRID (Monday-first, Australian standard)
+═══════════════════════════════════════════════════ */
+function renderCalendar(yr,mo,mes){
+  const daysInMo=new Date(yr,mo,0).getDate();
+  // Mon=0 … Sun=6
+  const firstDow=(new Date(yr,mo-1,1).getDay()+6)%7;
+  const evMap={};
+  mes.forEach(e=>{evMap[e.date]=evMap[e.date]||[];evMap[e.date].push(e);});
+
+  const hdrs=['Mo','Tu','We','Th','Fr','Sa','Su'].map((h,i)=>
+    `<div class="cal-hd${i>=5?' wknd':''}">${h}</div>`).join('');
+
+  let cells='';
+  for(let i=0;i<firstDow;i++) cells+=`<div class="cal-cell empty"></div>`;
+  for(let d=1;d<=daysInMo;d++){
+    const ds=`${yr}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dow=(firstDow+d-1)%7; // 0=Mon 6=Sun
+    const isWknd=dow>=5;
+    const isToday=ds===TODAY;
+    const isSel=ds===selDay;
+    const dayEvs=evMap[ds]||[];
+    const dots=dayEvs.slice(0,3).map(e=>`<span class="dot ${e.type}"></span>`).join('');
+    const more=dayEvs.length>3?`<span class="dot-more">+${dayEvs.length-3}</span>`:'';
+    cells+=`<div class="cal-cell${isWknd?' wknd':''}" id="cell-${ds}" onclick="selectDay('${ds}')">
+      <div class="cal-num${isToday?' today':''}${isSel?' sel':''}">${d}</div>
+      <div class="cal-dots">${dots}${more}</div>
+    </div>`;
+  }
+
+  const legend=[
+    {t:'mandatory',c:'#C91B1B',l:'Mandatory'},
+    {t:'cns',c:'#7C3AED',l:'CNS Series'},
+    {t:'cvad',c:'#0D2D5E',l:'CVAD'},
+    {t:'diabetes',c:'#14803D',l:'Diabetes'},
+    {t:'wound',c:'#C97A00',l:'Wound'},
+    {t:'journal',c:'#0891B2',l:'Journal Club'},
+    {t:'vascular',c:'#1A6FAF',l:'Vascular'},
+    {t:'flexi',c:'#6B7280',l:'Other'},
+  ].map(x=>`<div class="leg"><div class="leg-dot" style="background:${x.c}"></div>${x.l}</div>`).join('');
+
+  return `<div class="cal-card">
+    <div class="cal-grid">${hdrs}${cells}</div>
+    <div class="legend">${legend}</div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════════
+   SELECT DAY
+═══════════════════════════════════════════════════ */
+function selectDay(ds,skipScroll){
+  // Toggle deselect
+  if(selDay===ds&&!skipScroll){selDay=null;renderDaySection([]);highlightCell(null);return;}
+  selDay=ds;
+  highlightCell(ds);
+  const dayEvs=events.filter(e=>e.date===ds).sort((a,b)=>a.time.localeCompare(b.time));
+  renderDaySection(dayEvs,ds);
+  if(!skipScroll) document.getElementById('daySection').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function highlightCell(ds){
+  // Remove all .sel
+  document.querySelectorAll('.cal-num.sel').forEach(el=>el.classList.remove('sel'));
+  if(ds){
+    const cell=document.getElementById('cell-'+ds);
+    if(cell) cell.querySelector('.cal-num').classList.add('sel');
+  }
+}
+
+function renderDaySection(dayEvs,ds){
+  const sec=document.getElementById('daySection');
+  if(!dayEvs.length){sec.innerHTML='';return;}
+  const d=new Date(ds+'T00:00:00');
+  const label=d.toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long'});
+  sec.innerHTML=`
+    <div class="day-section">
+      <div class="day-hdr">
+        <div class="day-hdr-left">📅 ${label}</div>
+        <button class="day-clear" onclick="selDay=null;renderDaySection([]);highlightCell(null);">✕ Clear</button>
+      </div>
+      ${dayEvs.map(e=>evCard(e)).join('')}
+    </div>
+  `;
+}
+
+/* ═══════════════════════════════════════════════════
+   EVENT CARD (staff view — tap opens detail)
+═══════════════════════════════════════════════════ */
+function evCard(ev){
+  const d=new Date(ev.date+'T00:00:00');
+  const ds=d.toLocaleDateString('en-AU',{day:'2-digit',month:'short'});
+  const dayName=DAYS_FULL[d.getDay()].slice(0,3);
+  return `<div class="ev-card ${ev.type}${ev.cancelled?' cancelled':''}" onclick="openEvDetail('${ev.id}')">
+    <div class="ev-body">
+      <div class="ev-meta">
+        <span class="dpill">${ds}</span>
+        <span class="daypill">${dayName}</span>
+        <span class="tpill">${ev.time}</span>
+        ${ev.cancelled?'<span class="canc-tag">CANCELLED</span>':''}
+      </div>
+      ${ev.loc
+        ?`<div class="ev-loc-row">📍 ${ev.loc}</div>`
+        :`<div class="ev-loc-row ev-loc-tbc">📍 Location TBC</div>`}
+      <div class="ev-topic">${ev.topic}</div>
+      <div class="ev-series">${ev.series}</div>
+      <div class="ev-nsqhs">${ev.nsqhs}</div>
+      <div class="ev-tap-hint">👆 Tap for details</div>
+    </div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════════
+   EVENT DETAIL MODAL
+═══════════════════════════════════════════════════ */
+function openEvDetail(id){
+  const ev=events.find(e=>e.id===id); if(!ev) return;
+  const d=new Date(ev.date+'T00:00:00');
+  const ds=d.toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const meta=TYPE_META[ev.type]||{label:ev.type,icon:'📋'};
+
+  document.getElementById('evdTitle').textContent=ev.topic;
+  document.getElementById('evdBody').innerHTML=`
+    ${ev.cancelled?'<div class="ib r"><strong>Session Status</strong>This session has been CANCELLED. Contact your educator for details.</div>':''}
+    <div class="type-banner ${ev.type}">${meta.icon} ${meta.label}</div>
+    <div class="detail-row">
+      <div class="d-icon">📅</div>
+      <div><div class="d-lbl">Date</div><div class="d-val">${ds}</div></div>
+    </div>
+    <div class="detail-row">
+      <div class="d-icon">🕒</div>
+      <div><div class="d-lbl">Time</div><div class="d-val">${ev.time} AEST</div></div>
+    </div>
+    <div class="detail-row">
+      <div class="d-icon">📍</div>
+      <div><div class="d-lbl">Location</div><div class="d-val">${ev.loc||'<span style="color:var(--muted);font-style:italic;">TBC</span>'}</div></div>
+    </div>
+    <div class="detail-row">
+      <div class="d-icon">📚</div>
+      <div><div class="d-lbl">Series / Context</div><div class="d-val">${ev.series}</div></div>
+    </div>
+    <div class="ib b">
+      <strong>NSQHS Standards</strong>${ev.nsqhs}
+    </div>
+    ${ev.notes?`<div class="ib a"><strong>Notes for Attendees</strong>${ev.notes}</div>`:''}
+  `;
+  openModal('evdOv');
+}
+
+/* ═══════════════════════════════════════════════════
+   NOTIFICATIONS
+═══════════════════════════════════════════════════ */
+function updateBadge(){
+  const unread=notifs.filter(n=>!n.read).length;
+  const b=document.getElementById('bellBadge');
+  b.textContent=unread>9?'9+':String(unread);
+  b.classList.toggle('gone',unread===0);
+}
+
+function openNotif(){
+  renderNotifPanel();
+  openModal('notifOv');
+}
+
+function renderNotifPanel(){
+  const body=document.getElementById('notifBody');
+  if(!notifs.length){
+    body.innerHTML='<div class="empty-notif"><div class="empty-icon">📭</div>No notifications yet.<br><span style="font-size:13px;color:var(--muted);">Your educator will send alerts here.</span></div>';
+    return;
+  }
+
+  // Browser push permission row
+  const pushRow=(Notification.permission==='default')?`
+    <div class="push-permit-row">
+      <p>Allow browser notifications to be alerted even when the app is not in focus.</p>
+      <button class="push-btn" onclick="reqPush()">Allow</button>
+    </div>`:
+    (Notification.permission==='denied')?`<div class="ib a" style="margin-bottom:12px;"><strong>Browser Notifications Blocked</strong>Enable them in your browser site settings to receive push alerts.</div>`:'';
+
+  body.innerHTML=pushRow+notifs.map(n=>{
+    const d=new Date(n.ts);
+    const ds=d.toLocaleDateString('en-AU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+    const tc=n.type==='alert'?'alert-t':n.type==='urgent'?'urgent-t':'';
+    return `<div class="notif-item ${tc} ${n.read?'read':'unread'}">
+      <div class="ni-row">
+        <span class="ni-badge ${n.type}">${n.type.toUpperCase()}</span>
+        <span class="ni-time">${ds}</span>
+      </div>
+      <div class="ni-title">${n.title}</div>
+      <div class="ni-msg">${n.message}</div>
+    </div>`;
+  }).join('');
+}
+
+function markAllRead(){
+  notifs.forEach(n=>n.read=true);
+  localStorage.setItem('hith_notifs',JSON.stringify(notifs));
+  updateBadge();
+  renderNotifPanel();
+}
+
+function reqPush(){
+  Notification.requestPermission().then(p=>{
+    if(p==='granted') showToast('Browser notifications enabled ✓');
+    renderNotifPanel();
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   MODAL HELPERS
+═══════════════════════════════════════════════════ */
+function openModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';}
+function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
+function ovClose(e,id){if(e.target.id===id) closeModal(id);}
+
+/* ═══════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════ */
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+/* ═══════════════════════════════════════════════════
+   START
+═══════════════════════════════════════════════════ */
+init();
+</script>
+</body>
+</html>
