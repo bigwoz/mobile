@@ -189,6 +189,17 @@ body{background:var(--bg);color:var(--text);min-height:100vh;}
 .sms-copy-btn{background:var(--bg);color:var(--text);border:1.5px solid var(--border);padding:12px 14px;border-radius:var(--r-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;}
 .sms-note{font-size:11px;color:var(--muted);margin-top:8px;font-style:italic;}
 
+/* NSQHS CHIPS */
+.nsqhs-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px;}
+.nsqhs-chip{padding:8px 10px;border-radius:var(--r-sm);border:1.5px solid var(--border);cursor:pointer;background:var(--bg);transition:all .15s;-webkit-user-select:none;user-select:none;}
+.nsqhs-chip.sel{border-color:var(--blue);background:var(--blue-lt);}
+.nsqhs-num{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:2px;}
+.nsqhs-chip.sel .nsqhs-num{color:var(--blue);}
+.nsqhs-lbl{font-size:12px;font-weight:600;color:var(--muted);line-height:1.3;}
+.nsqhs-chip.sel .nsqhs-lbl{color:var(--text);}
+.nsqhs-desc{font-size:10px;color:var(--muted);line-height:1.4;margin-top:3px;display:none;}
+.nsqhs-chip.sel .nsqhs-desc{display:block;color:var(--blue);}
+
 .hidden{display:none!important;}
 </style>
 </head>
@@ -230,8 +241,52 @@ body{background:var(--bg);color:var(--text);min-height:100vh;}
       <div class="fg"><label class="fl">End Time</label><input type="time" class="fi" id="evTe" value="15:30"></div>
     </div>
     <div class="fg"><label class="fl">Topic / Session Title</label><input type="text" class="fi" id="evTopic" placeholder="e.g. BLS Annual Update"></div>
-    <div class="fg"><label class="fl">Series / Context</label><input type="text" class="fi" id="evSeries" placeholder="e.g. Mandatory Competency"></div>
-    <div class="fg"><label class="fl">NSQHS Standards</label><input type="text" class="fi" id="evNsqhs" placeholder="e.g. NSQHS 1 · NSQHS 5"></div>
+    <div class="fg">
+      <label class="fl">NSQHS Standards</label>
+      <div class="nsqhs-grid">
+        <div class="nsqhs-chip" data-n="1" onclick="toggleNsqhs(this)">
+          <div class="nsqhs-num">NSQHS 1</div>
+          <div class="nsqhs-lbl">Clinical Governance</div>
+          <div class="nsqhs-desc">Leadership, safety systems, and staff accountability.</div>
+        </div>
+        <div class="nsqhs-chip" data-n="2" onclick="toggleNsqhs(this)">
+          <div class="nsqhs-num">NSQHS 2</div>
+          <div class="nsqhs-lbl">Partnering with Consumers</div>
+          <div class="nsqhs-desc">Patient inclusion in care design and delivery.</div>
+        </div>
+        <div class="nsqhs-chip" data-n="3" onclick="toggleNsqhs(this)">
+          <div class="nsqhs-num">NSQHS 3</div>
+          <div class="nsqhs-lbl">Infection Control</div>
+          <div class="nsqhs-desc">Hand hygiene, clean environments, and infection prevention.</div>
+        </div>
+        <div class="nsqhs-chip" data-n="4" onclick="toggleNsqhs(this)">
+          <div class="nsqhs-num">NSQHS 4</div>
+          <div class="nsqhs-lbl">Medication Safety</div>
+          <div class="nsqhs-desc">Safe prescribing, dispensing, and error reduction.</div>
+        </div>
+        <div class="nsqhs-chip" data-n="5" onclick="toggleNsqhs(this)">
+          <div class="nsqhs-num">NSQHS 5</div>
+          <div class="nsqhs-lbl">Comprehensive Care</div>
+          <div class="nsqhs-desc">Holistic planning and risk management (falls, pressure injuries).</div>
+        </div>
+        <div class="nsqhs-chip" data-n="6" onclick="toggleNsqhs(this)">
+          <div class="nsqhs-num">NSQHS 6</div>
+          <div class="nsqhs-lbl">Communicating for Safety</div>
+          <div class="nsqhs-desc">Accurate clinical handovers and patient identification.</div>
+        </div>
+        <div class="nsqhs-chip" data-n="7" onclick="toggleNsqhs(this)">
+          <div class="nsqhs-num">NSQHS 7</div>
+          <div class="nsqhs-lbl">Blood Management</div>
+          <div class="nsqhs-desc">Safe, appropriate use and storage of blood products.</div>
+        </div>
+        <div class="nsqhs-chip" data-n="8" onclick="toggleNsqhs(this)">
+          <div class="nsqhs-num">NSQHS 8</div>
+          <div class="nsqhs-lbl">Acute Deterioration</div>
+          <div class="nsqhs-desc">Recognizing and responding rapidly to worsening patient health.</div>
+        </div>
+      </div>
+      <input type="text" class="fi" id="evNsqhsNote" placeholder="Additional context or notes… (optional)">
+    </div>
     <div class="fg">
       <label class="fl">Location *</label>
       <select class="fs" id="evLocSel" onchange="handleLocSel()">
@@ -521,6 +576,17 @@ const SEED=[
   {id:'e081',date:'2026-11-30',topic:'CVAD Alteplase Administration',series:'Vascular Access',nsqhs:'NSQHS 4 · NSQHS 5',type:'cvad',time:'15:00–15:30',loc:'',notes:'',cancelled:false},
 ];
 
+const NSQHS_STANDARDS=[
+  {n:1,short:'Clinical Governance',      desc:'Leadership, safety systems, and staff accountability.'},
+  {n:2,short:'Partnering with Consumers',desc:'Patient inclusion in care design and delivery.'},
+  {n:3,short:'Infection Control',         desc:'Hand hygiene, clean environments, and infection prevention.'},
+  {n:4,short:'Medication Safety',         desc:'Safe prescribing, dispensing, and error reduction.'},
+  {n:5,short:'Comprehensive Care',        desc:'Holistic planning and risk management (falls, pressure injuries).'},
+  {n:6,short:'Communicating for Safety',  desc:'Accurate clinical handovers and patient identification.'},
+  {n:7,short:'Blood Management',          desc:'Safe, appropriate use and storage of blood products.'},
+  {n:8,short:'Acute Deterioration',       desc:'Recognizing and responding rapidly to worsening patient health.'},
+];
+
 const LOC_PRESETS=['L3 Debrief Room 1','L3 Debrief Room 2','L3 Debrief Room 3','L3 Debrief Room','L3 Clinical Workshop','L3 Skills Room 1','L3 Skills Room 2','L3 Skills Room 3','L2 Meeting Room','L2 Conference Room','L1 @Home Team Room','Bldg A Mortuary Lecture Theatre'];
 
 /* ===== STATE ===== */
@@ -623,7 +689,8 @@ function openAddModal(){
   document.getElementById('editId').value='';
   document.getElementById('evDate').value=new Date().toISOString().slice(0,10);
   document.getElementById('evTs').value='15:00'; document.getElementById('evTe').value='15:30';
-  ['evTopic','evSeries','evNsqhs','evNotes'].forEach(id=>document.getElementById(id).value='');
+  ['evTopic','evNsqhsNote','evNotes'].forEach(id=>document.getElementById(id).value='');
+  document.querySelectorAll('.nsqhs-chip').forEach(c=>c.classList.remove('sel'));
   document.getElementById('evLocSel').value='';
   document.getElementById('evLocOther').value='';
   document.getElementById('evLocOther').style.display='none';
@@ -641,8 +708,10 @@ function openEdit(id){
   const [ts,te]=(ev.time||'15:00–15:30').split('–');
   document.getElementById('evTs').value=ts.trim(); document.getElementById('evTe').value=(te||'15:30').trim();
   document.getElementById('evTopic').value=ev.topic;
-  document.getElementById('evSeries').value=ev.series;
-  document.getElementById('evNsqhs').value=ev.nsqhs;
+  document.querySelectorAll('.nsqhs-chip').forEach(c=>{
+    c.classList.toggle('sel',(ev.nsqhsSel||[]).includes(parseInt(c.dataset.n)));
+  });
+  document.getElementById('evNsqhsNote').value=ev.nsqhsNote||'';
   const locVal=ev.loc||'';
   const locSel=document.getElementById('evLocSel');
   const locOther=document.getElementById('evLocOther');
@@ -660,6 +729,20 @@ function openEdit(id){
   if(chip){chip.classList.add('sel');} curType=ev.type;
   openModal('evModal');
 }
+function toggleNsqhs(el){ el.classList.toggle('sel'); }
+
+function getNsqhsData(){
+  const sel=[];
+  document.querySelectorAll('.nsqhs-chip.sel').forEach(c=>sel.push(parseInt(c.dataset.n)));
+  const note=document.getElementById('evNsqhsNote').value.trim();
+  const parts=sel.map(n=>{
+    const s=NSQHS_STANDARDS.find(x=>x.n===n);
+    return s?`NSQHS ${n} · ${s.short}`:'';
+  }).filter(Boolean);
+  if(note) parts.push(note);
+  return {nsqhsSel:sel, nsqhsNote:note, nsqhs:parts.join(' · ')||''};
+}
+
 function handleLocSel(){
   const v=document.getElementById('evLocSel').value;
   const other=document.getElementById('evLocOther');
@@ -677,11 +760,12 @@ function saveEvent(){
   const locSel=document.getElementById('evLocSel').value;
   const locOther=document.getElementById('evLocOther').value.trim();
   const loc=locSel==='__other__'?locOther:locSel;
+  const {nsqhsSel,nsqhsNote,nsqhs}=getNsqhsData();
   if(!date||!topic||!loc){toast('Please fill in Date, Topic and Location');return;}
   const data={
     id:id||'e'+Date.now(), date, topic,
-    series:document.getElementById('evSeries').value.trim(),
-    nsqhs:document.getElementById('evNsqhs').value.trim(),
+    series:'',
+    nsqhs, nsqhsSel, nsqhsNote,
     type:curType,
     time:document.getElementById('evTs').value+'–'+document.getElementById('evTe').value,
     loc,
