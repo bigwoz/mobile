@@ -84,6 +84,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;}
 .bsm.edit{background:var(--blue-lt);color:var(--blue);}
 .bsm.canc{background:var(--amber-bg);color:var(--amber);}
 .bsm.del{background:var(--red-bg);color:var(--red);}
+.bsm.notify{background:var(--green-bg);color:var(--green);}
 
 /* FAB */
 .fab{position:fixed;bottom:24px;right:20px;background:var(--blue);color:#fff;border:none;width:58px;height:58px;border-radius:50%;font-size:30px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.28);display:flex;align-items:center;justify-content:center;z-index:200;font-family:inherit;}
@@ -677,6 +678,7 @@ function evCard(ev){
     </div>
     <div class="ev-actions">
       <button class="bsm edit" onclick="openEdit('${ev.id}')">✏️ Edit</button>
+      <button class="bsm notify" onclick="openAlertForEvent('${ev.id}')">🔔 Alert</button>
       <button class="bsm canc" onclick="togCancel('${ev.id}')">${ev.cancelled?'↩️ Restore':'⊘ Cancel'}</button>
       <button class="bsm del" onclick="delEv('${ev.id}')">🗑 Delete</button>
     </div>
@@ -815,6 +817,14 @@ function saveContacts(){
 /* ===== ALERT MODAL ===== */
 function openAlertModal(){
   document.getElementById('nTitle').value=''; document.getElementById('nMsg').value='';
+  alertTab('compose'); openModal('alertModal');
+}
+function openAlertForEvent(id){
+  const ev=events.find(e=>e.id===id); if(!ev) return;
+  const startTime=(ev.time||'15:00').split('–')[0].trim();
+  const loc=ev.loc||'TBC';
+  document.getElementById('nTitle').value=ev.topic;
+  document.getElementById('nMsg').value=`Inservice today @ ${startTime} in ${loc}`;
   alertTab('compose'); openModal('alertModal');
 }
 function alertTab(t){
