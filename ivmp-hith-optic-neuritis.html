@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>IV Methylprednisolone · HITH</title>
+<style>
+:root {
+  --navy: #0D2D5E;
+  --navy-mid: #164080;
+  --blue: #1A6FAF;
+  --blue-lt: #E5F0FA;
+  --bg: #EEF2F7;
+  --surface: #FFFFFF;
+  --amber: #C97A00;
+  --amber-bg: #FFFBEB;
+  --amber-bd: #FDE68A;
+  --red: #C91B1B;
+  --red-bg: #FEF2F2;
+  --red-bd: #FEB4B4;
+  --green: #14803D;
+  --green-bg: #F0FDF4;
+  --green-bd: #A7F3C3;
+  --muted: #6B7280;
+  --border: #DDE3EC;
+  --text: #1B2333;
+  --r: 13px;
+  --r-sm: 8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:80px;
+}
+
+/* ── HEADER ── */
+.hdr{
+  background:var(--navy);color:#fff;
+  padding:14px 16px 0;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 14px rgba(0,0,0,.28);
+}
+.hdr-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.drug-eyebrow{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:2px;}
+.drug-name{font-size:19px;font-weight:800;line-height:1.15;letter-spacing:-.3px;}
+.drug-sub{font-size:12px;color:rgba(255,255,255,.55);margin-top:2px;}
+.hith-pill{
+  background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.22);
+  color:#fff;font-size:10px;font-weight:700;letter-spacing:.07em;
+  padding:4px 9px;border-radius:20px;white-space:nowrap;margin-top:2px;
+}
+
+/* ── DAY TABS ── */
+.day-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:6px;}
+.day-tabs-ex{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding-bottom:13px;}
+.d-tab{
+  background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.18);
+  color:rgba(255,255,255,.65);font-size:12px;font-weight:700;
+  padding:8px 4px 6px;border-radius:8px;cursor:pointer;text-align:center;
+  transition:all .18s;
+}
+.d-tab .d-sub{display:block;font-size:10px;font-weight:400;color:rgba(255,255,255,.42);margin-top:1px;}
+.d-tab.active{background:#fff;border-color:#fff;color:var(--navy);}
+.d-tab.active .d-sub{color:var(--blue);}
+/* Exception tabs — amber tint */
+.d-tab.ex{
+  background:rgba(201,122,0,.18);border-color:rgba(253,230,138,.35);
+  color:rgba(255,255,255,.7);
+}
+.d-tab.ex .d-sub{color:rgba(253,230,138,.6);}
+.d-tab.ex::before{content:'⚠ ';font-size:10px;}
+.d-tab.ex.active{background:#FDE68A;border-color:#FDE68A;color:#78350F;}
+.d-tab.ex.active .d-sub{color:#92400E;}
+
+/* ── CONTENT ── */
+.content{padding:12px 14px;}
+.day-pane{display:none;}
+.day-pane.visible{display:block;}
+
+/* ── NOTICE BANNER ── */
+.notice{
+  display:flex;gap:10px;align-items:flex-start;
+  border-radius:var(--r-sm);padding:12px 13px;margin-bottom:12px;
+}
+.notice.amber{background:var(--amber-bg);border:1px solid var(--amber-bd);}
+.notice.blue{background:var(--blue-lt);border:1px solid #BAD8F0;}
+.notice.red{background:var(--red-bg);border:1px solid var(--red-bd);}
+.notice-ico{font-size:17px;flex-shrink:0;margin-top:1px;}
+.notice-txt{font-size:13px;font-weight:500;}
+.notice.amber .notice-txt{color:#78350F;}
+.notice.blue .notice-txt{color:#1E3A5F;}
+.notice.red .notice-txt{color:#7F1D1D;}
+.notice-txt strong{display:block;margin-bottom:2px;}
+
+/* ── SECTION CARD ── */
+.sec{background:var(--surface);border-radius:var(--r);margin-bottom:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+.sec-hdr{
+  display:flex;align-items:center;padding:13px 15px;
+  cursor:pointer;user-select:none;gap:11px;
+}
+.sec-ico{
+  width:36px;height:36px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+}
+.si-b{background:#DBEAFE;} .si-a{background:#FEF3C7;} .si-g{background:#DCFCE7;}
+.si-r{background:#FEE2E2;} .si-p{background:#EDE9FE;} .si-n{background:#E0ECF8;}
+.sec-ttl-grp{flex:1;min-width:0;}
+.sec-ttl{font-size:15px;font-weight:700;color:var(--navy);}
+.sec-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.sec-chev{font-size:11px;color:var(--muted);transition:transform .22s;flex-shrink:0;}
+.sec.open .sec-chev{transform:rotate(180deg);}
+.prog-pill{
+  font-size:11px;font-weight:700;padding:3px 9px;
+  border-radius:20px;background:var(--blue-lt);color:var(--blue);
+  white-space:nowrap;flex-shrink:0;
+}
+.prog-pill.done{background:var(--green-bg);color:var(--green);}
+.sec-body{display:none;padding:0 15px 15px;border-top:1px solid var(--border);}
+.sec.open .sec-body{display:block;}
+
+/* ── INFO BOXES ── */
+.ib{border-radius:var(--r-sm);padding:11px 13px;font-size:13px;margin-top:10px;}
+.ib.b{background:var(--blue-lt);border-left:3px solid var(--blue);color:#1E3A5F;}
+.ib.a{background:var(--amber-bg);border-left:3px solid var(--amber);color:#78350F;}
+.ib.r{background:var(--red-bg);border-left:3px solid var(--red);color:#7F1D1D;}
+.ib.g{background:var(--green-bg);border-left:3px solid var(--green);color:#14532D;}
+.ib strong{display:block;font-weight:700;margin-bottom:3px;}
+
+/* ── CHECKLIST ── */
+.cl{margin-top:12px;}
+.ci{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;
+}
+.ci:last-child{border-bottom:none;}
+.cb{
+  width:23px;height:23px;min-width:23px;
+  border:2px solid var(--border);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;background:#fff;margin-top:1px;
+}
+.ci.chk .cb{background:var(--green);border-color:var(--green);}
+.ci.chk .cb::after{content:'✓';font-size:13px;font-weight:800;color:#fff;}
+.ci-lbl{flex:1;font-size:14px;color:var(--text);line-height:1.45;}
+.ci.chk .ci-lbl{text-decoration:line-through;color:var(--muted);}
+.cn{font-size:12px;color:var(--blue);display:block;margin-top:2px;font-style:italic;}
+.ci.warn .cb{border-color:var(--amber);}
+.ci.warn .cn{color:var(--amber);}
+.ci.crit .cb{border-color:var(--red);}
+
+/* ── STEPS ── */
+.steps-list{margin-top:12px;}
+.step-row{display:flex;gap:11px;padding:10px 0;border-bottom:1px solid var(--border);}
+.step-row:last-child{border-bottom:none;}
+.step-n{
+  width:26px;height:26px;min-width:26px;
+  background:var(--navy);color:#fff;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;margin-top:1px;
+}
+.step-c .step-t{font-size:14px;font-weight:700;color:var(--text);}
+.step-c .step-d{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.4;}
+
+/* ── PATHOLOGY CHECKER ── */
+.path-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+.path-f{
+  border:2px solid var(--border);border-radius:10px;
+  padding:13px 10px;text-align:center;
+  transition:border-color .2s,background .2s;
+}
+.path-f label{display:block;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px;}
+.path-f input{
+  width:100%;border:none;background:transparent;
+  font-size:24px;font-weight:800;color:var(--navy);
+  text-align:center;outline:none;
+}
+.path-f input::placeholder{color:var(--border);}
+.path-f .pu{font-size:11px;color:var(--muted);margin-top:4px;}
+.path-f.ok{border-color:var(--green);background:var(--green-bg);}
+.path-f.bad{border-color:var(--red);background:var(--red-bg);}
+.path-f.ok label,.path-f.ok .pu{color:#14532D;}
+.path-f.bad label,.path-f.bad .pu{color:#7F1D1D;}
+.path-res{
+  display:none;margin-top:10px;padding:11px 13px;
+  border-radius:var(--r-sm);font-size:13px;font-weight:600;text-align:center;
+}
+.path-res.show{display:block;}
+.path-res.ok{background:var(--green-bg);color:var(--green);}
+.path-res.bad{background:var(--red-bg);color:var(--red);}
+
+/* ── VITALS TABLE ── */
+.vt{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px;border-radius:var(--r-sm);overflow:hidden;}
+.vt th{background:var(--navy);color:#fff;padding:9px 11px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.04em;}
+.vt td{padding:10px 11px;border-bottom:1px solid var(--border);vertical-align:top;font-size:13px;}
+.vt tr:last-child td{border-bottom:none;}
+.vt tr:nth-child(even) td{background:#FAFCFF;}
+.t-pill{
+  display:inline-block;background:var(--navy);color:#fff;
+  font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;
+  white-space:nowrap;
+}
+
+/* ── INFUSION TIMER ── */
+.timer-card{
+  background:var(--navy);border-radius:var(--r);
+  padding:20px;margin-top:14px;text-align:center;color:#fff;
+}
+.tmr-eye{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:8px;}
+.rate-grp{display:flex;gap:7px;justify-content:center;margin-bottom:14px;}
+.rate-btn{
+  background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);
+  color:rgba(255,255,255,.75);font-size:12px;font-weight:700;
+  padding:7px 13px;border-radius:8px;cursor:pointer;line-height:1.3;
+}
+.rate-btn .rs{display:block;font-size:9px;font-weight:400;color:rgba(255,255,255,.45);margin-top:1px;}
+.rate-btn.sel{background:#fff;border-color:#fff;color:var(--navy);}
+.rate-btn.sel .rs{color:var(--blue);}
+.tmr-digits{font-size:54px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-1px;line-height:1;}
+.tmr-sub{font-size:12px;color:rgba(255,255,255,.45);margin-top:7px;}
+.tmr-btns{display:flex;gap:9px;justify-content:center;margin-top:16px;}
+.tb{
+  background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);
+  color:#fff;font-size:13px;font-weight:700;
+  padding:11px 20px;border-radius:9px;cursor:pointer;
+}
+.tb.pr{background:var(--blue);border-color:var(--blue);}
+
+/* ── ADVERSE EFFECTS ── */
+.ae{border-radius:var(--r-sm);padding:13px 14px;margin-top:10px;border:1px solid transparent;}
+.ae.r{background:var(--red-bg);border-color:var(--red-bd);}
+.ae.a{background:var(--amber-bg);border-color:var(--amber-bd);}
+.ae.b{background:var(--blue-lt);border-color:#BAD8F0;}
+.ae-hdr{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px;}
+.ae-sev{font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:20px;}
+.ae-sev.r{background:var(--red);color:#fff;}
+.ae-sev.a{background:var(--amber);color:#fff;}
+.ae-sev.b{background:var(--blue);color:#fff;}
+.ae-nm{font-size:14px;font-weight:700;color:var(--text);}
+.ae-sg{font-size:13px;color:var(--muted);margin-bottom:7px;}
+.ae-act{font-size:13px;font-weight:700;}
+.ae-act.r{color:var(--red);}
+.ae-act.a{color:var(--amber);}
+.ae-act.b{color:var(--blue);}
+
+/* ── CONTACTS MODAL ── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);
+  z-index:300;overflow-y:auto;padding:20px 14px 40px;
+}
+.modal-overlay.open{display:block;}
+.modal{
+  background:#fff;border-radius:16px;padding:20px;
+  max-width:480px;margin:0 auto;
+}
+.modal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.modal-ttl{font-size:17px;font-weight:800;color:#7F1D1D;}
+.modal-close{
+  background:var(--border);border:none;border-radius:8px;
+  padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text);
+}
+.ct-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);}
+.ct-row:last-of-type{border-bottom:none;}
+.ct-lbl{font-size:12px;color:var(--muted);}
+.ct-nm{font-size:15px;font-weight:700;color:var(--text);}
+.call-btn{
+  display:flex;align-items:center;gap:5px;
+  background:var(--green);color:#fff;border:none;
+  font-size:13px;font-weight:700;padding:9px 16px;border-radius:9px;
+  cursor:pointer;text-decoration:none;white-space:nowrap;
+}
+.call-btn.r{background:var(--red);}
+.modal-footer{font-size:11px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.5;}
+
+/* ── STICKY ESCALATE BAR ── */
+.esc-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--red);padding:13px 16px;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  cursor:pointer;z-index:200;
+  box-shadow:0 -4px 18px rgba(201,27,27,.38);
+}
+.esc-bar span{color:#fff;font-size:14px;font-weight:800;letter-spacing:.02em;}
+
+/* ── DIVIDER ── */
+.div{border:none;border-top:1px solid var(--border);margin:12px 0;}
+
+/* ── DRUG REF TABLE ── */
+.drug-row{display:flex;padding:9px 0;border-bottom:1px solid var(--border);gap:12px;}
+.drug-row:last-child{border-bottom:none;}
+.dr-k{font-size:13px;font-weight:600;color:var(--muted);min-width:110px;flex-shrink:0;}
+.dr-v{font-size:14px;color:var(--text);font-weight:500;}
+</style>
+</head>
+<body>
+
+<!-- ═══ STICKY HEADER ═══ -->
+<div class="hdr">
+  <div class="hdr-row">
+    <div>
+      <div class="drug-eyebrow">SVHM HITH · Optic Neuritis</div>
+      <div class="drug-name">Methylprednisolone 1g IV</div>
+      <div class="drug-sub">3–5 day course · Sodium succinate</div>
+    </div>
+    <div class="hith-pill">SOP Dec 2023</div>
+  </div>
+  <div class="day-tabs">
+    <div class="d-tab" id="tab-1" onclick="setDay(1)">Day 1<span class="d-sub">Hospital</span></div>
+    <div class="d-tab active" id="tab-2" onclick="setDay(2)">Day 2<span class="d-sub">HITH Visit 1</span></div>
+    <div class="d-tab" id="tab-3" onclick="setDay(3)">Day 3<span class="d-sub">HITH Visit 2</span></div>
+  </div>
+  <div class="day-tabs-ex">
+    <div class="d-tab ex" id="tab-4" onclick="setDay(4)">Day 4<span class="d-sub">By exception</span></div>
+    <div class="d-tab ex" id="tab-5" onclick="setDay(5)">Day 5<span class="d-sub">By exception</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ DAY 1 ═══════════════════════════════════ -->
+<div class="day-pane" id="pane-1">
+<div class="content">
+
+  <div class="notice blue">
+    <div class="notice-ico">🏥</div>
+    <div class="notice-txt"><strong>Day 1 — Hospital only</strong>First dose must be administered in hospital (inpatient ward, clinic, or ED) with emergency response access. This is not a HITH nursing role.</div>
+  </div>
+
+  <!-- Drug overview -->
+  <div class="sec open" id="d1-ov">
+    <div class="sec-hdr" onclick="tog('d1-ov')">
+      <div class="sec-ico si-b">💊</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Drug Overview</div><div class="sec-sub">Indication, dose & dilution</div></div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="drug-row"><div class="dr-k">Indication</div><div class="dr-v">Acute optic neuritis — accelerates visual recovery</div></div>
+      <div class="drug-row"><div class="dr-k">Drug</div><div class="dr-v">Methylprednisolone sodium succinate (Solu-Medrol)</div></div>
+      <div class="drug-row"><div class="dr-k">Dose</div><div class="dr-v">1 gram IV daily</div></div>
+      <div class="drug-row"><div class="dr-k">Course</div><div class="dr-v">3 days (Day 1 hospital · Days 2–3 HITH)</div></div>
+      <div class="drug-row"><div class="dr-k">Diluent</div><div class="dr-v">NaCl 0.9% 100 mL</div></div>
+      <div class="drug-row"><div class="dr-k">Standard rate</div><div class="dr-v">Over 30–60 minutes (100–200 mL/hr)</div></div>
+      <div class="drug-row"><div class="dr-k">Cardiac risk</div><div class="dr-v">Over 2 hours (50 mL/hr) — arrhythmia risk</div></div>
+      <div class="drug-row"><div class="dr-k">Timing</div><div class="dr-v">18–24 hours between infusions</div></div>
+      <div class="ib b" style="margin-top:12px;"><strong>Optic Neuritis Context</strong>High-dose IVMP accelerates the rate of visual recovery in acute optic neuritis but does not improve final visual outcome. It also reduces the 2-year risk of a second MS event.</div>
+    </div>
+  </div>
+
+  <!-- Inclusion criteria -->
+  <div class="sec" id="d1-inc">
+    <div class="sec-hdr" onclick="tog('d1-inc')">
+      <div class="sec-ico si-g">✅</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">HITH Inclusion Criteria</div><div class="sec-sub">All must be met before HITH referral</div></div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="cl" id="inc-list">
+        <div class="ci" onclick="chk(this,null,null)"><div class="cb"></div><div class="ci-lbl">Medically stable</div></div>
+        <div class="ci" onclick="chk(this,null,null)"><div class="cb"></div><div class="ci-lbl">Independent with ADLs — or assistance available</div></div>
+        <div class="ci" onclick="chk(this,null,null)"><div class="cb"></div><div class="ci-lbl">Cognitively intact — or sufficient supervision available</div></div>
+        <div class="ci" onclick="chk(this,null,null)"><div class="cb"></div><div class="ci-lbl">Access to home telephone / mobile</div></div>
+        <div class="ci" onclick="chk(this,null,null)"><div class="cb"></div><div class="ci-lbl">Safe and suitable home environment</div></div>
+        <div class="ci" onclick="chk(this,null,null)"><div class="cb"></div><div class="ci-lbl">Patient consents to HITH care</div></div>
+        <div class="ci" onclick="chk(this,null,null)"><div class="cb"></div><div class="ci-lbl">Lives within the HITH catchment area</div></div>
+      </div>
+      <div class="ib a" style="margin-top:12px;"><strong>Before HITH Referral</strong>Active infection screening (when indicated) should be completed before the HITH referral is accepted.</div>
+    </div>
+  </div>
+
+  <!-- Contraindications -->
+  <div class="sec" id="d1-ci">
+    <div class="sec-hdr" onclick="tog('d1-ci')">
+      <div class="sec-ico si-r">🚫</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Contraindications</div><div class="sec-sub">Do not administer if any present</div></div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="cl">
+        <div class="ci crit"><div class="cb" style="border-color:var(--red)"></div><div class="ci-lbl">Known hypersensitivity to methylprednisolone or corticosteroids</div></div>
+        <div class="ci crit"><div class="cb" style="border-color:var(--red)"></div><div class="ci-lbl">Active systemic fungal infection</div></div>
+        <div class="ci crit"><div class="cb" style="border-color:var(--red)"></div><div class="ci-lbl">Active untreated tuberculosis</div></div>
+        <div class="ci crit"><div class="cb" style="border-color:var(--red)"></div><div class="ci-lbl">Live vaccine administered within past 4 weeks</div></div>
+        <div class="ci warn"><div class="cb"></div><div class="ci-lbl">Active uncontrolled systemic infection<span class="cn">⚠ Discuss with prescriber before proceeding</span></div></div>
+        <div class="ci warn"><div class="cb"></div><div class="ci-lbl">Uncontrolled diabetes mellitus<span class="cn">⚠ Enhanced BGL monitoring — RMO to direct frequency</span></div></div>
+        <div class="ci warn"><div class="cb"></div><div class="ci-lbl">Known cardiac arrhythmia risk<span class="cn">⚠ Infuse over 2 hours only</span></div></div>
+      </div>
+      <div class="ib a" style="margin-top:12px;"><strong>Use With Caution</strong>Peptic ulcer disease · Osteoporosis · Glaucoma / ocular hypertension · Psychiatric history · Immunosuppression</div>
+    </div>
+  </div>
+
+</div>
+</div><!-- /day 1 -->
+
+<!-- ═══════════════════════════════════ DAY 2 ═══════════════════════════════════ -->
+<div class="day-pane visible" id="pane-2">
+<div class="content">
+
+  <div class="notice amber">
+    <div class="notice-ico">📋</div>
+    <div class="notice-txt"><strong>HITH Visit 1 — Patient's 2nd Infusion</strong>Check Day 1 pathology before attending. Do not commence infusion until Na and K are confirmed within normal limits or at the patient's individual baseline.</div>
+  </div>
+
+  <!-- Pathology pre-check -->
+  <div class="sec open" id="d2-path">
+    <div class="sec-hdr" onclick="tog('d2-path')">
+      <div class="sec-ico si-a">🧪</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Pathology Pre-Check</div><div class="sec-sub">Check before attending — Day 1 U&amp;Es</div></div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="ib b"><strong>Check Day 1 U&amp;Es before leaving base</strong>May only proceed when Na and K are within normal limits, or stable at the patient's individual baseline.</div>
+      <div class="path-grid">
+        <div class="path-f" id="na2-f">
+          <label>Sodium Na⁺</label>
+          <input type="number" id="na2" placeholder="—" min="100" max="165" oninput="chkPath(2)">
+          <div class="pu">mmol/L · Ref: 135–145</div>
+        </div>
+        <div class="path-f" id="k2-f">
+          <label>Potassium K⁺</label>
+          <input type="number" id="k2" placeholder="—" step="0.1" min="1" max="9" oninput="chkPath(2)">
+          <div class="pu">mmol/L · Ref: 3.5–5.0</div>
+        </div>
+      </div>
+      <div class="path-res" id="path-res-2"></div>
+      <div class="ib r" style="margin-top:10px;"><strong>If outside normal limits →</strong>Do NOT attend patient. Liaise with HITH medical team for direction before any patient intervention.</div>
+    </div>
+  </div>
+
+  <!-- Equipment -->
+  <div class="sec" id="d2-eq">
+    <div class="sec-hdr" onclick="tog('d2-eq')">
+      <div class="sec-ico si-b">🎒</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Equipment Checklist</div><div class="sec-sub">Pack before leaving base</div></div>
+      <div class="prog-pill" id="d2-eq-p">0/15</div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="cl" id="d2-eq-l">
+        <div class="ci" onclick="chk(this,'d2-eq-p','d2-eq-l')"><div class="cb"></div><div class="ci-lbl">Methylprednisolone sodium succinate 1g vial<span class="cn">Solu-Medrol or generic — confirm against drug chart</span></div></div>
+        <div class="ci" onclick="chk(this,'d2-eq-p','d2-eq-l')"><div class="cb"></div><div class="ci-lbl">NaCl 0.9% 100 mL infusion bag<span class="cn">Or as per prescriber order</span></div></div>
+        <div class="ci" onclick="chk(this,'d2-eq-p','d2-eq-l')"><div class="cb"></div><div class="ci-lbl">IV administration set (standard — gravity or pump)</div></div>
+        <div class="ci" onclick="chk(this,'d2-eq-p','d2-eq-l')"><div class="cb"></div><div class="ci-lbl">NaCl 0.9% pre-filled flush syringes 10 mL × 2</div></div>
+        <div class="ci" onclick="chk(this,'d2-eq-p','d2-eq-l')"><div class="cb"></div><div class="ci-lbl">IV cannula 18–20G (in case of re-site)</div></div>
+        <div class="ci" onclick="chk(this,'d2-eq-p','d2-eq-l')"><div class="cb"></div><div class="ci-lbl">Tourniquet · Alcohol/CHG swabs · IV dressing (Tegaderm)</div></div>
+        <div class="ci warn" onclick="chk(this,'d2-eq-p','d2-eq-l')"><div class="cb"></div><div class="ci-lbl">Anaphylaxis kit (adrenaline, antihistamine, hydrocortisone)<span class="cn">⚠ Must be immediately accessible throughout entire infusion</span></div></div>
+        <div class="ci" onclick="chk(this,'d2-eq-p','d2-eq-l')"><div class="cb"></div><div class="ci-lbl">Non-sterile gloves (multiple pairs)</div></div>
+        <div class="ci" onclick="chk(this,'d2-eq-p','d2-eq-l')"><div class="cb"></div><div class="ci-lbl">Portable sharps container</div></div>
+        <div class="ci" onclick="chk(this,'d2-eq-p','d2-eq-l')"><div class="cb"></div><div class="ci-lbl">Clinical waste bag</div></div>
+        <div class="ci" onclick="chk(this,'d2-eq-p','d2-eq-l')"><div class="cb"></div><div class="ci-lbl">BP cuff · Pulse oximeter · Thermometer</div></div>
+        <div class="ci" onclick="chk(this,'d2-eq-p','d2-eq-l')"><div class="cb"></div><div class="ci-lbl">Point-of-care glucometer · strips · lancets</div></div>
+        <div class="ci" onclick="chk(this,'d2-eq-p','d2-eq-l')"><div class="cb"></div><div class="ci-lbl">Pathology collection: vacutainer · U&amp;E tubes · patient labels · request form</div></div>
+        <div class="ci" onclick="chk(this,'d2-eq-p','d2-eq-l')"><div class="cb"></div><div class="ci-lbl">HITH drug chart · clinical notes · observation chart</div></div>
+        <div class="ci" onclick="chk(this,'d2-eq-p','d2-eq-l')"><div class="cb"></div><div class="ci-lbl">Visual acuity testing card / chart (when indicated)</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pre-infusion assessment -->
+  <div class="sec" id="d2-pre">
+    <div class="sec-hdr" onclick="tog('d2-pre')">
+      <div class="sec-ico si-g">👤</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Pre-Infusion Assessment</div><div class="sec-sub">On arrival at patient's home</div></div>
+      <div class="prog-pill" id="d2-pre-p">0/9</div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="cl" id="d2-pre-l">
+        <div class="ci crit" onclick="chk(this,'d2-pre-p','d2-pre-l')"><div class="cb"></div><div class="ci-lbl">Confirm patient identity — 2 identifiers (name + DOB)<span class="cn" style="color:var(--red)">Match to drug chart and clinical notes</span></div></div>
+        <div class="ci crit" onclick="chk(this,'d2-pre-p','d2-pre-l')"><div class="cb"></div><div class="ci-lbl">Allergy check — confirm no new allergies or reactions since Day 1</div></div>
+        <div class="ci" onclick="chk(this,'d2-pre-p','d2-pre-l')"><div class="cb"></div><div class="ci-lbl">Verify prescription on drug chart — right drug · dose · diluent · rate · route</div></div>
+        <div class="ci" onclick="chk(this,'d2-pre-p','d2-pre-l')"><div class="cb"></div><div class="ci-lbl">Baseline vital signs: BP · HR · RR · SpO₂ · Temperature<span class="cn">Document on observation chart before starting infusion</span></div></div>
+        <div class="ci warn" onclick="chk(this,'d2-pre-p','d2-pre-l')"><div class="cb"></div><div class="ci-lbl">Baseline blood glucose level (BGL) — all patients<span class="cn">⚠ Enhanced frequency if diabetic or as directed by RMO</span></div></div>
+        <div class="ci" onclick="chk(this,'d2-pre-p','d2-pre-l')"><div class="cb"></div><div class="ci-lbl">Cannula assessment — patency, no redness, swelling, pain or leakage<span class="cn">Re-site if any concern</span></div></div>
+        <div class="ci" onclick="chk(this,'d2-pre-p','d2-pre-l')"><div class="cb"></div><div class="ci-lbl">Ask patient about side effects since Day 1<span class="cn">Sleep disturbance · mood change · metallic taste · facial flushing · indigestion</span></div></div>
+        <div class="ci" onclick="chk(this,'d2-pre-p','d2-pre-l')"><div class="cb"></div><div class="ci-lbl">Visual acuity assessment (when indicated by treating team)</div></div>
+        <div class="ci warn" onclick="chk(this,'d2-pre-p','d2-pre-l')"><div class="cb"></div><div class="ci-lbl">Confirm anaphylaxis kit is immediately accessible<span class="cn">⚠ Mandatory before commencing infusion</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Drug preparation -->
+  <div class="sec" id="d2-prep">
+    <div class="sec-hdr" onclick="tog('d2-prep')">
+      <div class="sec-ico si-p">⚗️</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Drug Preparation</div><div class="sec-sub">Reconstitution · labelling · priming</div></div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="ib b"><strong>Solu-Medrol Act-O-Vial System</strong>Two-compartment vial — diluent (top chamber) separated from powder (bottom). Activation merges them.</div>
+      <div class="steps-list">
+        <div class="step-row"><div class="step-n">1</div><div class="step-c"><div class="step-t">Hand hygiene</div><div class="step-d">Wash or apply alcohol gel. Don non-sterile gloves.</div></div></div>
+        <div class="step-row"><div class="step-n">2</div><div class="step-c"><div class="step-t">Inspect the vial</div><div class="step-d">Check expiry date, vial integrity. Confirm not previously activated. Remove outer protective plastic cap.</div></div></div>
+        <div class="step-row"><div class="step-n">3</div><div class="step-c"><div class="step-t">Activate Act-O-Vial</div><div class="step-d">Press firmly down on the plastic activator button on the top to push the diluent from the upper chamber into the lower powder chamber.</div></div></div>
+        <div class="step-row"><div class="step-n">4</div><div class="step-c"><div class="step-t">Mix gently</div><div class="step-d">Rotate and invert vial gently to dissolve powder. <strong>Do not shake vigorously.</strong></div></div></div>
+        <div class="step-row"><div class="step-n">5</div><div class="step-c"><div class="step-t">Inspect the solution</div><div class="step-d">Should appear clear to pale yellow. <strong>Do not use</strong> if cloudy, discoloured, or contains particles.</div></div></div>
+        <div class="step-row"><div class="step-n">6</div><div class="step-c"><div class="step-t">Transfer to infusion bag</div><div class="step-d">Using aseptic technique, withdraw reconstituted solution and inject into NaCl 0.9% 100 mL bag. Mix gently.</div></div></div>
+        <div class="step-row"><div class="step-n">7</div><div class="step-c"><div class="step-t">Label the bag</div><div class="step-d">Drug name · Dose (1g) · Diluent · Volume · Date & time prepared · Expiry (use within 12h) · Preparer initials.</div></div></div>
+        <div class="step-row"><div class="step-n">8</div><div class="step-c"><div class="step-t">Prime IV set</div><div class="step-d">Spike bag aseptically, prime line fully, expel all air. Confirm no air bubbles in drip chamber or tubing.</div></div></div>
+        <div class="step-row"><div class="step-n">9</div><div class="step-c"><div class="step-t">Dispose of sharps</div><div class="step-d">Place needles and spike directly into portable sharps container.</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Administration & Timer -->
+  <div class="sec" id="d2-adm">
+    <div class="sec-hdr" onclick="tog('d2-adm')">
+      <div class="sec-ico si-n">💉</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Administration &amp; Timer</div><div class="sec-sub">Cannula · infusion · rate</div></div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="cl">
+        <div class="ci" onclick="chk(this,null,null)"><div class="cb"></div><div class="ci-lbl">Pre-flush IV cannula with NaCl 0.9% 10 mL — confirm patency</div></div>
+        <div class="ci" onclick="chk(this,null,null)"><div class="cb"></div><div class="ci-lbl">Connect primed IV administration set to cannula</div></div>
+        <div class="ci" onclick="chk(this,null,null)"><div class="cb"></div><div class="ci-lbl">Set infusion rate per selection below — regulate roller clamp or pump</div></div>
+        <div class="ci" onclick="chk(this,null,null)"><div class="cb"></div><div class="ci-lbl">Document start time on drug chart and observation chart</div></div>
+      </div>
+      <div class="timer-card">
+        <div class="tmr-eye">Select infusion duration</div>
+        <div class="rate-grp">
+          <div class="rate-btn" id="r2-30" onclick="setRate(2,30,this)">30 min<span class="rs">200 mL/hr</span></div>
+          <div class="rate-btn sel" id="r2-60" onclick="setRate(2,60,this)">60 min<span class="rs">100 mL/hr</span></div>
+          <div class="rate-btn" id="r2-120" onclick="setRate(2,120,this)">2 hr<span class="rs">Cardiac risk</span></div>
+        </div>
+        <div class="tmr-digits" id="tmr-2">60:00</div>
+        <div class="tmr-sub" id="tmr-sub-2">100 mL/hr · Start timer when infusion begins</div>
+        <div class="tmr-btns">
+          <button class="tb pr" onclick="startTmr(2)">▶ Start</button>
+          <button class="tb" onclick="pauseTmr(2)">⏸ Pause</button>
+          <button class="tb" onclick="resetTmr(2)">↺ Reset</button>
+        </div>
+      </div>
+      <div class="ib a" style="margin-top:12px;"><strong>⚠ Cardiac Arrhythmia Risk</strong>Select 2-hour rate if patient has known or suspected arrhythmia risk, per prescriber direction.</div>
+    </div>
+  </div>
+
+  <!-- Monitoring -->
+  <div class="sec" id="d2-mon">
+    <div class="sec-hdr" onclick="tog('d2-mon')">
+      <div class="sec-ico si-a">📊</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Monitoring During Infusion</div><div class="sec-sub">Vitals · BGL · visual acuity · pathology</div></div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <table class="vt">
+        <tr><th>Timepoint</th><th>Observations required</th></tr>
+        <tr><td><span class="t-pill">Baseline</span></td><td>BP · HR · RR · SpO₂ · Temp · BGL · Visual acuity (when indicated)</td></tr>
+        <tr><td><span class="t-pill">15 min</span></td><td>BP · HR · SpO₂ · BGL · Assess for adverse reactions</td></tr>
+        <tr><td><span class="t-pill">30 min</span></td><td>BP · HR · SpO₂</td></tr>
+        <tr><td><span class="t-pill">End of infusion</span></td><td>BP · HR · SpO₂ · Temp · BGL</td></tr>
+        <tr><td><span class="t-pill">30 min post</span></td><td>BP · HR · SpO₂ · Clinical review before departure</td></tr>
+      </table>
+      <div class="ib b" style="margin-top:12px;"><strong>Pathology — U&amp;Es (Day 2)</strong>Collect blood for Urea &amp; Electrolytes during infusion. Label with patient identifiers, complete request form, and arrange transport to lab. Results required prior to Day 3 visit.</div>
+      <div class="ib b" style="margin-top:10px;"><strong>Visual Acuity</strong>Conduct if indicated by treating team. Use HITH visual acuity tool. Document results clearly in MRO/clinical notes for comparison.</div>
+      <div class="ib a" style="margin-top:10px;"><strong>Blood Glucose</strong>Random BGL for all patients. More frequent monitoring for diabetic patients or as directed by RMO. BGL &gt;15 mmol/L → contact HITH medical team before continuing.</div>
+    </div>
+  </div>
+
+  <!-- Adverse effects -->
+  <div class="sec" id="d2-ae">
+    <div class="sec-hdr" onclick="tog('d2-ae')">
+      <div class="sec-ico si-r">⚠️</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Adverse Effects</div><div class="sec-sub">Recognition, severity &amp; action</div></div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="ae r">
+        <div class="ae-hdr"><span class="ae-sev r">STOP INFUSION · CALL 000</span></div>
+        <div class="ae-nm">Anaphylaxis / Severe Hypersensitivity</div>
+        <div class="ae-sg">Urticaria · angioedema · bronchospasm · hypotension · loss of consciousness · widespread rash</div>
+        <div class="ae-act r">→ STOP infusion immediately · Call 000 · Lay flat, legs elevated · Activate anaphylaxis kit · Adrenaline 500 mcg IM if trained</div>
+      </div>
+      <div class="ae r">
+        <div class="ae-hdr"><span class="ae-sev r">STOP INFUSION · CALL HMO</span></div>
+        <div class="ae-nm">Cardiac Arrhythmia</div>
+        <div class="ae-sg">Palpitations · irregular or rapid pulse · chest pain · pre-syncope or syncope</div>
+        <div class="ae-act r">→ STOP infusion · Call HITH HMO (9929 8788) · Consider 000 if haemodynamically compromised</div>
+      </div>
+      <div class="ae r">
+        <div class="ae-hdr"><span class="ae-sev r">STOP INFUSION · CALL HMO</span></div>
+        <div class="ae-nm">Severe Hypertension</div>
+        <div class="ae-sg">SBP &gt;180 mmHg and/or DBP &gt;110 mmHg · severe headache · visual changes</div>
+        <div class="ae-act r">→ STOP infusion · Contact HITH medical team for urgent direction</div>
+      </div>
+      <div class="ae a">
+        <div class="ae-hdr"><span class="ae-sev a">MONITOR · CALL HMO</span></div>
+        <div class="ae-nm">Hyperglycaemia</div>
+        <div class="ae-sg">BGL &gt;15 mmol/L · polyuria · thirst · fatigue · nausea</div>
+        <div class="ae-act a">→ Contact HITH medical team for insulin orders or direction before continuing infusion</div>
+      </div>
+      <div class="ae a">
+        <div class="ae-hdr"><span class="ae-sev a">MONITOR · CALL HMO IF WORSENING</span></div>
+        <div class="ae-nm">Neuropsychiatric Effects</div>
+        <div class="ae-sg">Agitation · confusion · mood disturbance · insomnia · rarely — psychosis</div>
+        <div class="ae-act a">→ Document. Contact HITH medical team if new-onset or worsening. Reassure patient — insomnia is expected.</div>
+      </div>
+      <div class="ae a">
+        <div class="ae-hdr"><span class="ae-sev a">MONITOR · CALL HMO</span></div>
+        <div class="ae-nm">Hypokalaemia</div>
+        <div class="ae-sg">Muscle weakness · cramps · palpitations (check K⁺ result if concerned)</div>
+        <div class="ae-act a">→ Review U&amp;E result. Contact HITH medical team if symptomatic or K⁺ &lt;3.0 mmol/L</div>
+      </div>
+      <div class="ae b">
+        <div class="ae-hdr"><span class="ae-sev b">EXPECTED — REASSURE</span></div>
+        <div class="ae-nm">Common / Benign Side Effects</div>
+        <div class="ae-sg">Metallic taste during infusion · facial flushing · mild headache · mild mood elevation · indigestion · insomnia</div>
+        <div class="ae-act b">→ Reassure patient — these are expected and self-limiting. Document. Advise patient to eat before/with dose if indigestion occurs.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post infusion -->
+  <div class="sec" id="d2-post">
+    <div class="sec-hdr" onclick="tog('d2-post')">
+      <div class="sec-ico si-g">✅</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Post-Infusion Checklist</div><div class="sec-sub">Completion, care &amp; documentation</div></div>
+      <div class="prog-pill" id="d2-post-p">0/8</div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="cl" id="d2-post-l">
+        <div class="ci" onclick="chk(this,'d2-post-p','d2-post-l')"><div class="cb"></div><div class="ci-lbl">Infusion complete — clamp IV line / close administration set</div></div>
+        <div class="ci" onclick="chk(this,'d2-post-p','d2-post-l')"><div class="cb"></div><div class="ci-lbl">Post-flush: NaCl 0.9% 10 mL to clear cannula and line</div></div>
+        <div class="ci" onclick="chk(this,'d2-post-p','d2-post-l')"><div class="cb"></div><div class="ci-lbl">Post-infusion obs (30 min post): BP · HR · SpO₂ · BGL<span class="cn">Document before leaving patient</span></div></div>
+        <div class="ci" onclick="chk(this,'d2-post-p','d2-post-l')"><div class="cb"></div><div class="ci-lbl">Secure or remove IV cannula as per care plan — apply dressing</div></div>
+        <div class="ci" onclick="chk(this,'d2-post-p','d2-post-l')"><div class="cb"></div><div class="ci-lbl">Confirm U&amp;E sample labelled correctly and dispatched to laboratory</div></div>
+        <div class="ci" onclick="chk(this,'d2-post-p','d2-post-l')"><div class="cb"></div><div class="ci-lbl">Complete documentation: MRO · drug chart · obs chart · visual acuity · pathology dispatched · start/end times</div></div>
+        <div class="ci" onclick="chk(this,'d2-post-p','d2-post-l')"><div class="cb"></div><div class="ci-lbl">Provide patient with HITH contact numbers and instructions<span class="cn">Advise Day 3 visit will be 18–24 hours from now</span></div></div>
+        <div class="ci" onclick="chk(this,'d2-post-p','d2-post-l')"><div class="cb"></div><div class="ci-lbl">Dispose of sharps · bag clinical waste · remove gloves · decontaminate equipment</div></div>
+      </div>
+      <div class="ib b" style="margin-top:12px;"><strong>Before Leaving</strong>Patient must be clinically stable. Document full handover-ready notes. Day 3 visit to be performed 18–24 hours after this infusion.</div>
+    </div>
+  </div>
+
+</div>
+</div><!-- /day 2 -->
+
+<!-- ═══════════════════════════════════ DAY 3 ═══════════════════════════════════ -->
+<div class="day-pane" id="pane-3">
+<div class="content">
+
+  <div class="notice amber">
+    <div class="notice-ico">📋</div>
+    <div class="notice-txt"><strong>HITH Visit 2 — Patient's 3rd (Final) Infusion</strong>Perform 18–24 hours after Day 2. Check Day 2 U&Es before attending. After completion: notify HITH Consultant, complete discharge documentation, transfer care to RVEEH.</div>
+  </div>
+
+  <!-- Pathology pre-check D3 -->
+  <div class="sec open" id="d3-path">
+    <div class="sec-hdr" onclick="tog('d3-path')">
+      <div class="sec-ico si-a">🧪</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Pathology Pre-Check</div><div class="sec-sub">Check Day 2 U&Es before attending</div></div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="ib b"><strong>Check Day 2 U&amp;Es before leaving base</strong>May only proceed when Na and K are within normal limits or stable at the patient's individual baseline.</div>
+      <div class="path-grid">
+        <div class="path-f" id="na3-f">
+          <label>Sodium Na⁺</label>
+          <input type="number" id="na3" placeholder="—" min="100" max="165" oninput="chkPath(3)">
+          <div class="pu">mmol/L · Ref: 135–145</div>
+        </div>
+        <div class="path-f" id="k3-f">
+          <label>Potassium K⁺</label>
+          <input type="number" id="k3" placeholder="—" step="0.1" min="1" max="9" oninput="chkPath(3)">
+          <div class="pu">mmol/L · Ref: 3.5–5.0</div>
+        </div>
+      </div>
+      <div class="path-res" id="path-res-3"></div>
+      <div class="ib r" style="margin-top:10px;"><strong>If outside normal limits →</strong>Do NOT attend patient. Liaise with HITH medical team for direction before any patient intervention.</div>
+    </div>
+  </div>
+
+  <!-- Equipment D3 -->
+  <div class="sec" id="d3-eq">
+    <div class="sec-hdr" onclick="tog('d3-eq')">
+      <div class="sec-ico si-b">🎒</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Equipment Checklist</div><div class="sec-sub">Pack before leaving base</div></div>
+      <div class="prog-pill" id="d3-eq-p">0/15</div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="cl" id="d3-eq-l">
+        <div class="ci" onclick="chk(this,'d3-eq-p','d3-eq-l')"><div class="cb"></div><div class="ci-lbl">Methylprednisolone sodium succinate 1g vial<span class="cn">Confirm against drug chart</span></div></div>
+        <div class="ci" onclick="chk(this,'d3-eq-p','d3-eq-l')"><div class="cb"></div><div class="ci-lbl">NaCl 0.9% 100 mL infusion bag</div></div>
+        <div class="ci" onclick="chk(this,'d3-eq-p','d3-eq-l')"><div class="cb"></div><div class="ci-lbl">IV administration set</div></div>
+        <div class="ci" onclick="chk(this,'d3-eq-p','d3-eq-l')"><div class="cb"></div><div class="ci-lbl">NaCl 0.9% flush syringes 10 mL × 2</div></div>
+        <div class="ci" onclick="chk(this,'d3-eq-p','d3-eq-l')"><div class="cb"></div><div class="ci-lbl">IV cannula 18–20G (in case of re-site)</div></div>
+        <div class="ci" onclick="chk(this,'d3-eq-p','d3-eq-l')"><div class="cb"></div><div class="ci-lbl">Tourniquet · Alcohol/CHG swabs · IV dressing</div></div>
+        <div class="ci warn" onclick="chk(this,'d3-eq-p','d3-eq-l')"><div class="cb"></div><div class="ci-lbl">Anaphylaxis kit<span class="cn">⚠ Must be immediately accessible throughout infusion</span></div></div>
+        <div class="ci" onclick="chk(this,'d3-eq-p','d3-eq-l')"><div class="cb"></div><div class="ci-lbl">Gloves · portable sharps container · clinical waste bag</div></div>
+        <div class="ci" onclick="chk(this,'d3-eq-p','d3-eq-l')"><div class="cb"></div><div class="ci-lbl">BP cuff · pulse oximeter · thermometer</div></div>
+        <div class="ci" onclick="chk(this,'d3-eq-p','d3-eq-l')"><div class="cb"></div><div class="ci-lbl">Point-of-care glucometer · strips · lancets</div></div>
+        <div class="ci" onclick="chk(this,'d3-eq-p','d3-eq-l')"><div class="cb"></div><div class="ci-lbl">Pathology collection: vacutainer · U&amp;E tubes · patient labels · request form</div></div>
+        <div class="ci" onclick="chk(this,'d3-eq-p','d3-eq-l')"><div class="cb"></div><div class="ci-lbl">Visual acuity card / chart (when indicated)</div></div>
+        <div class="ci" onclick="chk(this,'d3-eq-p','d3-eq-l')"><div class="cb"></div><div class="ci-lbl">HITH drug chart and clinical notes</div></div>
+        <div class="ci" onclick="chk(this,'d3-eq-p','d3-eq-l')"><div class="cb"></div><div class="ci-lbl">IV cannula removal dressing kit</div></div>
+        <div class="ci" onclick="chk(this,'d3-eq-p','d3-eq-l')"><div class="cb"></div><div class="ci-lbl">Discharge paperwork / transfer-of-care documentation for RVEEH</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pre-infusion D3 -->
+  <div class="sec" id="d3-pre">
+    <div class="sec-hdr" onclick="tog('d3-pre')">
+      <div class="sec-ico si-g">👤</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Pre-Infusion Assessment</div><div class="sec-sub">On arrival at patient's home</div></div>
+      <div class="prog-pill" id="d3-pre-p">0/8</div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="cl" id="d3-pre-l">
+        <div class="ci crit" onclick="chk(this,'d3-pre-p','d3-pre-l')"><div class="cb"></div><div class="ci-lbl">Confirm patient identity — 2 identifiers (name + DOB)</div></div>
+        <div class="ci crit" onclick="chk(this,'d3-pre-p','d3-pre-l')"><div class="cb"></div><div class="ci-lbl">Allergy check — any new concerns since Day 2</div></div>
+        <div class="ci" onclick="chk(this,'d3-pre-p','d3-pre-l')"><div class="cb"></div><div class="ci-lbl">Verify prescription on drug chart</div></div>
+        <div class="ci" onclick="chk(this,'d3-pre-p','d3-pre-l')"><div class="cb"></div><div class="ci-lbl">Baseline vital signs: BP · HR · RR · SpO₂ · Temperature</div></div>
+        <div class="ci warn" onclick="chk(this,'d3-pre-p','d3-pre-l')"><div class="cb"></div><div class="ci-lbl">Baseline BGL — all patients<span class="cn">⚠ Enhanced frequency if directed</span></div></div>
+        <div class="ci" onclick="chk(this,'d3-pre-p','d3-pre-l')"><div class="cb"></div><div class="ci-lbl">Cannula assessment — patency and site condition</div></div>
+        <div class="ci" onclick="chk(this,'d3-pre-p','d3-pre-l')"><div class="cb"></div><div class="ci-lbl">Review side effects from Day 2 — document any new concerns</div></div>
+        <div class="ci" onclick="chk(this,'d3-pre-p','d3-pre-l')"><div class="cb"></div><div class="ci-lbl">Visual acuity assessment (when indicated)</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Drug preparation D3 (abbreviated) -->
+  <div class="sec" id="d3-prep">
+    <div class="sec-hdr" onclick="tog('d3-prep')">
+      <div class="sec-ico si-p">⚗️</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Drug Preparation</div><div class="sec-sub">Reconstitution · labelling · priming</div></div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="steps-list">
+        <div class="step-row"><div class="step-n">1</div><div class="step-c"><div class="step-t">Hand hygiene — don gloves</div></div></div>
+        <div class="step-row"><div class="step-n">2</div><div class="step-c"><div class="step-t">Inspect vial</div><div class="step-d">Check expiry, integrity. Remove plastic cap.</div></div></div>
+        <div class="step-row"><div class="step-n">3</div><div class="step-c"><div class="step-t">Activate Act-O-Vial</div><div class="step-d">Press activator button to release diluent into powder chamber.</div></div></div>
+        <div class="step-row"><div class="step-n">4</div><div class="step-c"><div class="step-t">Mix gently — inspect</div><div class="step-d">Rotate to dissolve. Must be clear/pale yellow. No particles. Do not shake.</div></div></div>
+        <div class="step-row"><div class="step-n">5</div><div class="step-c"><div class="step-t">Transfer to NaCl 0.9% 100 mL bag</div><div class="step-d">Aseptic technique. Mix gently after transfer.</div></div></div>
+        <div class="step-row"><div class="step-n">6</div><div class="step-c"><div class="step-t">Label bag · Prime IV set</div><div class="step-d">Drug · dose · diluent · date/time · expiry (use within 12h) · initials. Prime set fully — no air bubbles.</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Administration D3 -->
+  <div class="sec" id="d3-adm">
+    <div class="sec-hdr" onclick="tog('d3-adm')">
+      <div class="sec-ico si-n">💉</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Administration &amp; Timer</div><div class="sec-sub">Final infusion</div></div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="cl">
+        <div class="ci" onclick="chk(this,null,null)"><div class="cb"></div><div class="ci-lbl">Pre-flush cannula — NaCl 0.9% 10 mL, confirm patency</div></div>
+        <div class="ci" onclick="chk(this,null,null)"><div class="cb"></div><div class="ci-lbl">Connect primed IV set to cannula</div></div>
+        <div class="ci" onclick="chk(this,null,null)"><div class="cb"></div><div class="ci-lbl">Set infusion rate per selection below</div></div>
+        <div class="ci" onclick="chk(this,null,null)"><div class="cb"></div><div class="ci-lbl">Document start time on drug chart and observation chart</div></div>
+      </div>
+      <div class="timer-card">
+        <div class="tmr-eye">Select infusion duration</div>
+        <div class="rate-grp">
+          <div class="rate-btn" id="r3-30" onclick="setRate(3,30,this)">30 min<span class="rs">200 mL/hr</span></div>
+          <div class="rate-btn sel" id="r3-60" onclick="setRate(3,60,this)">60 min<span class="rs">100 mL/hr</span></div>
+          <div class="rate-btn" id="r3-120" onclick="setRate(3,120,this)">2 hr<span class="rs">Cardiac risk</span></div>
+        </div>
+        <div class="tmr-digits" id="tmr-3">60:00</div>
+        <div class="tmr-sub" id="tmr-sub-3">100 mL/hr · Start timer when infusion begins</div>
+        <div class="tmr-btns">
+          <button class="tb pr" onclick="startTmr(3)">▶ Start</button>
+          <button class="tb" onclick="pauseTmr(3)">⏸ Pause</button>
+          <button class="tb" onclick="resetTmr(3)">↺ Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monitoring D3 -->
+  <div class="sec" id="d3-mon">
+    <div class="sec-hdr" onclick="tog('d3-mon')">
+      <div class="sec-ico si-a">📊</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Monitoring During Infusion</div><div class="sec-sub">Vitals · BGL · visual acuity · pathology</div></div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <table class="vt">
+        <tr><th>Timepoint</th><th>Observations required</th></tr>
+        <tr><td><span class="t-pill">Baseline</span></td><td>BP · HR · RR · SpO₂ · Temp · BGL · Visual acuity (when indicated)</td></tr>
+        <tr><td><span class="t-pill">15 min</span></td><td>BP · HR · SpO₂ · BGL · Adverse reaction assessment</td></tr>
+        <tr><td><span class="t-pill">30 min</span></td><td>BP · HR · SpO₂</td></tr>
+        <tr><td><span class="t-pill">End of infusion</span></td><td>BP · HR · SpO₂ · Temp · BGL</td></tr>
+        <tr><td><span class="t-pill">30 min post</span></td><td>BP · HR · SpO₂ · Final clinical review before discharge</td></tr>
+      </table>
+      <div class="ib b" style="margin-top:12px;"><strong>Pathology — U&amp;Es (Day 3)</strong>Collect blood for Urea &amp; Electrolytes during infusion. Label and dispatch. Include in discharge documentation.</div>
+      <div class="ib b" style="margin-top:10px;"><strong>Visual Acuity</strong>Conduct if indicated. Document clearly for discharge summary and MRO transfer to RVEEH.</div>
+    </div>
+  </div>
+
+  <!-- Adverse effects D3 (compact) -->
+  <div class="sec" id="d3-ae">
+    <div class="sec-hdr" onclick="tog('d3-ae')">
+      <div class="sec-ico si-r">⚠️</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Adverse Effects</div><div class="sec-sub">Recognition &amp; action</div></div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="ae r">
+        <div class="ae-hdr"><span class="ae-sev r">STOP · CALL 000</span></div>
+        <div class="ae-nm">Anaphylaxis</div>
+        <div class="ae-sg">Urticaria · angioedema · bronchospasm · hypotension · loss of consciousness</div>
+        <div class="ae-act r">→ STOP immediately · 000 · Lay flat · Anaphylaxis kit · Adrenaline IM if trained</div>
+      </div>
+      <div class="ae r">
+        <div class="ae-hdr"><span class="ae-sev r">STOP · CALL HMO</span></div>
+        <div class="ae-nm">Cardiac Arrhythmia</div>
+        <div class="ae-sg">Palpitations · irregular pulse · chest pain · syncope</div>
+        <div class="ae-act r">→ STOP · Call HITH HMO (9929 8788) · Consider 000</div>
+      </div>
+      <div class="ae a">
+        <div class="ae-hdr"><span class="ae-sev a">CALL HMO</span></div>
+        <div class="ae-nm">Hyperglycaemia (BGL &gt;15) · Neuropsychiatric · Severe BP</div>
+        <div class="ae-act a">→ Contact HITH medical team for direction</div>
+      </div>
+      <div class="ae b">
+        <div class="ae-hdr"><span class="ae-sev b">EXPECTED — REASSURE</span></div>
+        <div class="ae-nm">Metallic taste · Flushing · Insomnia · Mild mood changes · Indigestion</div>
+        <div class="ae-act b">→ Reassure patient. Document. Expected and self-limiting.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post-infusion + DISCHARGE D3 -->
+  <div class="sec" id="d3-post">
+    <div class="sec-hdr" onclick="tog('d3-post')">
+      <div class="sec-ico si-g">🏁</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Post-Infusion &amp; Discharge</div><div class="sec-sub">Final day — handover, documentation, transfer of care</div></div>
+      <div class="prog-pill" id="d3-post-p">0/9</div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="cl" id="d3-post-l">
+        <div class="ci" onclick="chk(this,'d3-post-p','d3-post-l')"><div class="cb"></div><div class="ci-lbl">Infusion complete — clamp IV line / close administration set</div></div>
+        <div class="ci" onclick="chk(this,'d3-post-p','d3-post-l')"><div class="cb"></div><div class="ci-lbl">Post-flush: NaCl 0.9% 10 mL</div></div>
+        <div class="ci" onclick="chk(this,'d3-post-p','d3-post-l')"><div class="cb"></div><div class="ci-lbl">30-min post-infusion obs: BP · HR · SpO₂ · BGL · final clinical review</div></div>
+        <div class="ci" onclick="chk(this,'d3-post-p','d3-post-l')"><div class="cb"></div><div class="ci-lbl">Remove IV cannula — apply pressure, dressing, confirm haemostasis</div></div>
+        <div class="ci" onclick="chk(this,'d3-post-p','d3-post-l')"><div class="cb"></div><div class="ci-lbl">Confirm U&amp;E sample labelled and dispatched</div></div>
+        <div class="ci" onclick="chk(this,'d3-post-p','d3-post-l')"><div class="cb"></div><div class="ci-lbl">Complete all documentation: MRO · drug chart · obs chart · visual acuity · pathology</div></div>
+        <div class="ci warn" onclick="chk(this,'d3-post-p','d3-post-l')"><div class="cb"></div><div class="ci-lbl">Notify HITH Consultant — handover of Day 3 completion and patient status<span class="cn">⚠ Mandatory before discharge from HITH</span></div></div>
+        <div class="ci warn" onclick="chk(this,'d3-post-p','d3-post-l')"><div class="cb"></div><div class="ci-lbl">Complete discharge summary + MRO documentation for RVEEH transfer of care<span class="cn">⚠ Email to relevant medical team at RVEEH</span></div></div>
+        <div class="ci" onclick="chk(this,'d3-post-p','d3-post-l')"><div class="cb"></div><div class="ci-lbl">Dispose of sharps · bag clinical waste · remove gloves · decontaminate equipment</div></div>
+      </div>
+      <div class="ib a" style="margin-top:12px;"><strong>Discharge Decision</strong>If patient has progressed as expected → discharge from HITH back to referring team (RVEEH) in consultation with HITH Consultant. If clinical concerns remain → liaise with HITH Consultant before discharging.</div>
+    </div>
+  </div>
+
+</div>
+</div><!-- /day 3 -->
+
+<!-- ═══════════════════════════════════ DAY 4 ═══════════════════════════════════ -->
+<div class="day-pane" id="pane-4">
+<div class="content">
+
+  <div class="notice amber">
+    <div class="notice-ico">⚠️</div>
+    <div class="notice-txt"><strong>HITH Visit 3 — Patient's 4th Infusion (By Exception)</strong>Extended course — standard 3-day regime insufficient. Check Day 3 U&Es before attending. Same process as Visit 2. Notify HITH Consultant before commencing.</div>
+  </div>
+
+  <!-- Pathology pre-check D4 -->
+  <div class="sec open" id="d4-path">
+    <div class="sec-hdr" onclick="tog('d4-path')">
+      <div class="sec-ico si-a">🧪</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Pathology Pre-Check</div><div class="sec-sub">Check Day 3 U&Es before attending</div></div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="ib b"><strong>Check Day 3 U&amp;Es before leaving base</strong>May only proceed when Na and K are within normal limits or stable at the patient's individual baseline.</div>
+      <div class="path-grid">
+        <div class="path-f" id="na4-f">
+          <label>Sodium Na⁺</label>
+          <input type="number" id="na4" placeholder="—" min="100" max="165" oninput="chkPath(4)">
+          <div class="pu">mmol/L · Ref: 135–145</div>
+        </div>
+        <div class="path-f" id="k4-f">
+          <label>Potassium K⁺</label>
+          <input type="number" id="k4" placeholder="—" step="0.1" min="1" max="9" oninput="chkPath(4)">
+          <div class="pu">mmol/L · Ref: 3.5–5.0</div>
+        </div>
+      </div>
+      <div class="path-res" id="path-res-4"></div>
+      <div class="ib r" style="margin-top:10px;"><strong>If outside normal limits →</strong>Do NOT attend patient. Liaise with HITH medical team for direction before any patient intervention.</div>
+    </div>
+  </div>
+
+  <!-- Equipment D4 -->
+  <div class="sec" id="d4-eq">
+    <div class="sec-hdr" onclick="tog('d4-eq')">
+      <div class="sec-ico si-b">🎒</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Equipment Checklist</div><div class="sec-sub">Pack before leaving base</div></div>
+      <div class="prog-pill" id="d4-eq-p">0/15</div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="cl" id="d4-eq-l">
+        <div class="ci" onclick="chk(this,'d4-eq-p','d4-eq-l')"><div class="cb"></div><div class="ci-lbl">Methylprednisolone sodium succinate 1g vial<span class="cn">Confirm against drug chart</span></div></div>
+        <div class="ci" onclick="chk(this,'d4-eq-p','d4-eq-l')"><div class="cb"></div><div class="ci-lbl">NaCl 0.9% 100 mL infusion bag</div></div>
+        <div class="ci" onclick="chk(this,'d4-eq-p','d4-eq-l')"><div class="cb"></div><div class="ci-lbl">IV administration set</div></div>
+        <div class="ci" onclick="chk(this,'d4-eq-p','d4-eq-l')"><div class="cb"></div><div class="ci-lbl">NaCl 0.9% flush syringes 10 mL × 2</div></div>
+        <div class="ci" onclick="chk(this,'d4-eq-p','d4-eq-l')"><div class="cb"></div><div class="ci-lbl">IV cannula 18–20G (in case of re-site)</div></div>
+        <div class="ci" onclick="chk(this,'d4-eq-p','d4-eq-l')"><div class="cb"></div><div class="ci-lbl">Tourniquet · Alcohol/CHG swabs · IV dressing</div></div>
+        <div class="ci warn" onclick="chk(this,'d4-eq-p','d4-eq-l')"><div class="cb"></div><div class="ci-lbl">Anaphylaxis kit<span class="cn">⚠ Must be immediately accessible throughout infusion</span></div></div>
+        <div class="ci" onclick="chk(this,'d4-eq-p','d4-eq-l')"><div class="cb"></div><div class="ci-lbl">Gloves · portable sharps container · clinical waste bag</div></div>
+        <div class="ci" onclick="chk(this,'d4-eq-p','d4-eq-l')"><div class="cb"></div><div class="ci-lbl">BP cuff · pulse oximeter · thermometer</div></div>
+        <div class="ci" onclick="chk(this,'d4-eq-p','d4-eq-l')"><div class="cb"></div><div class="ci-lbl">Point-of-care glucometer · strips · lancets</div></div>
+        <div class="ci" onclick="chk(this,'d4-eq-p','d4-eq-l')"><div class="cb"></div><div class="ci-lbl">Pathology collection: vacutainer · U&amp;E tubes · patient labels · request form</div></div>
+        <div class="ci" onclick="chk(this,'d4-eq-p','d4-eq-l')"><div class="cb"></div><div class="ci-lbl">Visual acuity card / chart (when indicated)</div></div>
+        <div class="ci" onclick="chk(this,'d4-eq-p','d4-eq-l')"><div class="cb"></div><div class="ci-lbl">HITH drug chart and clinical notes</div></div>
+        <div class="ci" onclick="chk(this,'d4-eq-p','d4-eq-l')"><div class="cb"></div><div class="ci-lbl">IV cannula removal dressing kit</div></div>
+        <div class="ci" onclick="chk(this,'d4-eq-p','d4-eq-l')"><div class="cb"></div><div class="ci-lbl">Discharge paperwork (if Day 4 is final day)</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pre-infusion D4 -->
+  <div class="sec" id="d4-pre">
+    <div class="sec-hdr" onclick="tog('d4-pre')">
+      <div class="sec-ico si-g">👤</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Pre-Infusion Assessment</div><div class="sec-sub">On arrival at patient's home</div></div>
+      <div class="prog-pill" id="d4-pre-p">0/8</div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="cl" id="d4-pre-l">
+        <div class="ci crit" onclick="chk(this,'d4-pre-p','d4-pre-l')"><div class="cb"></div><div class="ci-lbl">Confirm patient identity — 2 identifiers (name + DOB)</div></div>
+        <div class="ci crit" onclick="chk(this,'d4-pre-p','d4-pre-l')"><div class="cb"></div><div class="ci-lbl">Allergy check — any new concerns since Day 3</div></div>
+        <div class="ci" onclick="chk(this,'d4-pre-p','d4-pre-l')"><div class="cb"></div><div class="ci-lbl">Verify prescription on drug chart — extended course order confirmed</div></div>
+        <div class="ci" onclick="chk(this,'d4-pre-p','d4-pre-l')"><div class="cb"></div><div class="ci-lbl">Baseline vital signs: BP · HR · RR · SpO₂ · Temperature</div></div>
+        <div class="ci warn" onclick="chk(this,'d4-pre-p','d4-pre-l')"><div class="cb"></div><div class="ci-lbl">Baseline BGL — all patients<span class="cn">⚠ Enhanced frequency if directed — cumulative steroid effect increases risk</span></div></div>
+        <div class="ci" onclick="chk(this,'d4-pre-p','d4-pre-l')"><div class="cb"></div><div class="ci-lbl">Cannula assessment — patency and site condition</div></div>
+        <div class="ci" onclick="chk(this,'d4-pre-p','d4-pre-l')"><div class="cb"></div><div class="ci-lbl">Review side effects from Day 3 — document any new or worsening concerns</div></div>
+        <div class="ci" onclick="chk(this,'d4-pre-p','d4-pre-l')"><div class="cb"></div><div class="ci-lbl">Visual acuity assessment (when indicated)</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Drug preparation D4 -->
+  <div class="sec" id="d4-prep">
+    <div class="sec-hdr" onclick="tog('d4-prep')">
+      <div class="sec-ico si-p">⚗️</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Drug Preparation</div><div class="sec-sub">Reconstitution · labelling · priming</div></div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="steps-list">
+        <div class="step-row"><div class="step-n">1</div><div class="step-c"><div class="step-t">Hand hygiene — don gloves</div></div></div>
+        <div class="step-row"><div class="step-n">2</div><div class="step-c"><div class="step-t">Inspect vial</div><div class="step-d">Check expiry, integrity. Remove plastic cap.</div></div></div>
+        <div class="step-row"><div class="step-n">3</div><div class="step-c"><div class="step-t">Activate Act-O-Vial</div><div class="step-d">Press activator button to release diluent into powder chamber.</div></div></div>
+        <div class="step-row"><div class="step-n">4</div><div class="step-c"><div class="step-t">Mix gently — inspect</div><div class="step-d">Rotate to dissolve. Must be clear/pale yellow. No particles. Do not shake.</div></div></div>
+        <div class="step-row"><div class="step-n">5</div><div class="step-c"><div class="step-t">Transfer to NaCl 0.9% 100 mL bag</div><div class="step-d">Aseptic technique. Mix gently after transfer.</div></div></div>
+        <div class="step-row"><div class="step-n">6</div><div class="step-c"><div class="step-t">Label bag · Prime IV set</div><div class="step-d">Drug · dose · diluent · date/time · expiry (use within 12h) · initials. Prime set fully — no air bubbles.</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Administration D4 -->
+  <div class="sec" id="d4-adm">
+    <div class="sec-hdr" onclick="tog('d4-adm')">
+      <div class="sec-ico si-n">💉</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Administration &amp; Timer</div><div class="sec-sub">HITH Visit 3</div></div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="cl">
+        <div class="ci" onclick="chk(this,null,null)"><div class="cb"></div><div class="ci-lbl">Pre-flush cannula — NaCl 0.9% 10 mL, confirm patency</div></div>
+        <div class="ci" onclick="chk(this,null,null)"><div class="cb"></div><div class="ci-lbl">Connect primed IV set to cannula</div></div>
+        <div class="ci" onclick="chk(this,null,null)"><div class="cb"></div><div class="ci-lbl">Set infusion rate per selection below</div></div>
+        <div class="ci" onclick="chk(this,null,null)"><div class="cb"></div><div class="ci-lbl">Document start time on drug chart and observation chart</div></div>
+      </div>
+      <div class="timer-card">
+        <div class="tmr-eye">Select infusion duration</div>
+        <div class="rate-grp">
+          <div class="rate-btn" id="r4-30" onclick="setRate(4,30,this)">30 min<span class="rs">200 mL/hr</span></div>
+          <div class="rate-btn sel" id="r4-60" onclick="setRate(4,60,this)">60 min<span class="rs">100 mL/hr</span></div>
+          <div class="rate-btn" id="r4-120" onclick="setRate(4,120,this)">2 hr<span class="rs">Cardiac risk</span></div>
+        </div>
+        <div class="tmr-digits" id="tmr-4">60:00</div>
+        <div class="tmr-sub" id="tmr-sub-4">100 mL/hr · Start timer when infusion begins</div>
+        <div class="tmr-btns">
+          <button class="tb pr" onclick="startTmr(4)">▶ Start</button>
+          <button class="tb" onclick="pauseTmr(4)">⏸ Pause</button>
+          <button class="tb" onclick="resetTmr(4)">↺ Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monitoring D4 -->
+  <div class="sec" id="d4-mon">
+    <div class="sec-hdr" onclick="tog('d4-mon')">
+      <div class="sec-ico si-a">📊</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Monitoring During Infusion</div><div class="sec-sub">Vitals · BGL · visual acuity · pathology</div></div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <table class="vt">
+        <tr><th>Timepoint</th><th>Observations required</th></tr>
+        <tr><td><span class="t-pill">Baseline</span></td><td>BP · HR · RR · SpO₂ · Temp · BGL · Visual acuity (when indicated)</td></tr>
+        <tr><td><span class="t-pill">15 min</span></td><td>BP · HR · SpO₂ · BGL · Adverse reaction assessment</td></tr>
+        <tr><td><span class="t-pill">30 min</span></td><td>BP · HR · SpO₂</td></tr>
+        <tr><td><span class="t-pill">End of infusion</span></td><td>BP · HR · SpO₂ · Temp · BGL</td></tr>
+        <tr><td><span class="t-pill">30 min post</span></td><td>BP · HR · SpO₂ · Clinical review before departure</td></tr>
+      </table>
+      <div class="ib b" style="margin-top:12px;"><strong>Pathology — U&amp;Es (Day 4)</strong>Collect blood for Urea &amp; Electrolytes during infusion. Label and dispatch. Results required prior to Day 5 visit (if proceeding).</div>
+      <div class="ib b" style="margin-top:10px;"><strong>Visual Acuity</strong>Conduct if indicated. Document for comparison with previous days.</div>
+      <div class="ib a" style="margin-top:10px;"><strong>Blood Glucose</strong>Cumulative corticosteroid exposure increases hyperglycaemia risk. Monitor BGL closely. BGL &gt;15 mmol/L → contact HITH medical team.</div>
+    </div>
+  </div>
+
+  <!-- Adverse effects D4 -->
+  <div class="sec" id="d4-ae">
+    <div class="sec-hdr" onclick="tog('d4-ae')">
+      <div class="sec-ico si-r">⚠️</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Adverse Effects</div><div class="sec-sub">Recognition &amp; action</div></div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="ae r">
+        <div class="ae-hdr"><span class="ae-sev r">STOP · CALL 000</span></div>
+        <div class="ae-nm">Anaphylaxis</div>
+        <div class="ae-sg">Urticaria · angioedema · bronchospasm · hypotension · loss of consciousness</div>
+        <div class="ae-act r">→ STOP immediately · 000 · Lay flat · Anaphylaxis kit · Adrenaline IM if trained</div>
+      </div>
+      <div class="ae r">
+        <div class="ae-hdr"><span class="ae-sev r">STOP · CALL HMO</span></div>
+        <div class="ae-nm">Cardiac Arrhythmia</div>
+        <div class="ae-sg">Palpitations · irregular pulse · chest pain · syncope</div>
+        <div class="ae-act r">→ STOP · Call HITH HMO (9929 8788) · Consider 000</div>
+      </div>
+      <div class="ae a">
+        <div class="ae-hdr"><span class="ae-sev a">CALL HMO</span></div>
+        <div class="ae-nm">Hyperglycaemia (BGL &gt;15) · Neuropsychiatric · Severe BP</div>
+        <div class="ae-act a">→ Contact HITH medical team for direction</div>
+      </div>
+      <div class="ae b">
+        <div class="ae-hdr"><span class="ae-sev b">EXPECTED — REASSURE</span></div>
+        <div class="ae-nm">Metallic taste · Flushing · Insomnia · Mild mood changes · Indigestion</div>
+        <div class="ae-act b">→ Reassure patient. Document. Expected and self-limiting.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post-infusion D4 -->
+  <div class="sec" id="d4-post">
+    <div class="sec-hdr" onclick="tog('d4-post')">
+      <div class="sec-ico si-g">✅</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Post-Infusion Checklist</div><div class="sec-sub">Visit 3 completion &amp; plan</div></div>
+      <div class="prog-pill" id="d4-post-p">0/8</div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="cl" id="d4-post-l">
+        <div class="ci" onclick="chk(this,'d4-post-p','d4-post-l')"><div class="cb"></div><div class="ci-lbl">Infusion complete — clamp IV line / close administration set</div></div>
+        <div class="ci" onclick="chk(this,'d4-post-p','d4-post-l')"><div class="cb"></div><div class="ci-lbl">Post-flush: NaCl 0.9% 10 mL</div></div>
+        <div class="ci" onclick="chk(this,'d4-post-p','d4-post-l')"><div class="cb"></div><div class="ci-lbl">30-min post-infusion obs: BP · HR · SpO₂ · BGL · clinical review</div></div>
+        <div class="ci" onclick="chk(this,'d4-post-p','d4-post-l')"><div class="cb"></div><div class="ci-lbl">Secure or remove IV cannula as per care plan — apply dressing</div></div>
+        <div class="ci" onclick="chk(this,'d4-post-p','d4-post-l')"><div class="cb"></div><div class="ci-lbl">Confirm U&amp;E sample labelled and dispatched</div></div>
+        <div class="ci" onclick="chk(this,'d4-post-p','d4-post-l')"><div class="cb"></div><div class="ci-lbl">Complete documentation: MRO · drug chart · obs chart · visual acuity · pathology</div></div>
+        <div class="ci warn" onclick="chk(this,'d4-post-p','d4-post-l')"><div class="cb"></div><div class="ci-lbl">Notify HITH Consultant — handover of Day 4 completion, patient status, and Day 5 decision<span class="cn">⚠ Mandatory — Day 5 requires explicit consultant authorisation</span></div></div>
+        <div class="ci" onclick="chk(this,'d4-post-p','d4-post-l')"><div class="cb"></div><div class="ci-lbl">Dispose of sharps · bag clinical waste · remove gloves · decontaminate equipment</div></div>
+      </div>
+      <div class="ib a" style="margin-top:12px;"><strong>Day 5 Decision</strong>Day 5 proceeds only with explicit HITH Consultant authorisation following Day 4 handover. If not proceeding to Day 5, initiate discharge and transfer of care to RVEEH.</div>
+    </div>
+  </div>
+
+</div>
+</div><!-- /day 4 -->
+
+<!-- ═══════════════════════════════════ DAY 5 ═══════════════════════════════════ -->
+<div class="day-pane" id="pane-5">
+<div class="content">
+
+  <div class="notice amber">
+    <div class="notice-ico">⚠️</div>
+    <div class="notice-txt"><strong>HITH Visit 4 — Patient's 5th (Final) Infusion (By Exception)</strong>Perform 18–24 hours after Day 4. Check Day 4 U&Es before attending. This is the final permissible dose. Full discharge and RVEEH transfer of care to be completed today.</div>
+  </div>
+
+  <!-- Pathology pre-check D5 -->
+  <div class="sec open" id="d5-path">
+    <div class="sec-hdr" onclick="tog('d5-path')">
+      <div class="sec-ico si-a">🧪</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Pathology Pre-Check</div><div class="sec-sub">Check Day 4 U&Es before attending</div></div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="ib b"><strong>Check Day 4 U&amp;Es before leaving base</strong>May only proceed when Na and K are within normal limits or stable at the patient's individual baseline.</div>
+      <div class="path-grid">
+        <div class="path-f" id="na5-f">
+          <label>Sodium Na⁺</label>
+          <input type="number" id="na5" placeholder="—" min="100" max="165" oninput="chkPath(5)">
+          <div class="pu">mmol/L · Ref: 135–145</div>
+        </div>
+        <div class="path-f" id="k5-f">
+          <label>Potassium K⁺</label>
+          <input type="number" id="k5" placeholder="—" step="0.1" min="1" max="9" oninput="chkPath(5)">
+          <div class="pu">mmol/L · Ref: 3.5–5.0</div>
+        </div>
+      </div>
+      <div class="path-res" id="path-res-5"></div>
+      <div class="ib r" style="margin-top:10px;"><strong>If outside normal limits →</strong>Do NOT attend patient. Liaise with HITH medical team for direction before any patient intervention.</div>
+    </div>
+  </div>
+
+  <!-- Equipment D5 -->
+  <div class="sec" id="d5-eq">
+    <div class="sec-hdr" onclick="tog('d5-eq')">
+      <div class="sec-ico si-b">🎒</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Equipment Checklist</div><div class="sec-sub">Pack before leaving base</div></div>
+      <div class="prog-pill" id="d5-eq-p">0/15</div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="cl" id="d5-eq-l">
+        <div class="ci" onclick="chk(this,'d5-eq-p','d5-eq-l')"><div class="cb"></div><div class="ci-lbl">Methylprednisolone sodium succinate 1g vial<span class="cn">Confirm against drug chart</span></div></div>
+        <div class="ci" onclick="chk(this,'d5-eq-p','d5-eq-l')"><div class="cb"></div><div class="ci-lbl">NaCl 0.9% 100 mL infusion bag</div></div>
+        <div class="ci" onclick="chk(this,'d5-eq-p','d5-eq-l')"><div class="cb"></div><div class="ci-lbl">IV administration set</div></div>
+        <div class="ci" onclick="chk(this,'d5-eq-p','d5-eq-l')"><div class="cb"></div><div class="ci-lbl">NaCl 0.9% flush syringes 10 mL × 2</div></div>
+        <div class="ci" onclick="chk(this,'d5-eq-p','d5-eq-l')"><div class="cb"></div><div class="ci-lbl">IV cannula 18–20G (in case of re-site)</div></div>
+        <div class="ci" onclick="chk(this,'d5-eq-p','d5-eq-l')"><div class="cb"></div><div class="ci-lbl">Tourniquet · Alcohol/CHG swabs · IV dressing</div></div>
+        <div class="ci warn" onclick="chk(this,'d5-eq-p','d5-eq-l')"><div class="cb"></div><div class="ci-lbl">Anaphylaxis kit<span class="cn">⚠ Must be immediately accessible throughout infusion</span></div></div>
+        <div class="ci" onclick="chk(this,'d5-eq-p','d5-eq-l')"><div class="cb"></div><div class="ci-lbl">Gloves · portable sharps container · clinical waste bag</div></div>
+        <div class="ci" onclick="chk(this,'d5-eq-p','d5-eq-l')"><div class="cb"></div><div class="ci-lbl">BP cuff · pulse oximeter · thermometer</div></div>
+        <div class="ci" onclick="chk(this,'d5-eq-p','d5-eq-l')"><div class="cb"></div><div class="ci-lbl">Point-of-care glucometer · strips · lancets</div></div>
+        <div class="ci" onclick="chk(this,'d5-eq-p','d5-eq-l')"><div class="cb"></div><div class="ci-lbl">Pathology collection: vacutainer · U&amp;E tubes · patient labels · request form</div></div>
+        <div class="ci" onclick="chk(this,'d5-eq-p','d5-eq-l')"><div class="cb"></div><div class="ci-lbl">Visual acuity card / chart (when indicated)</div></div>
+        <div class="ci" onclick="chk(this,'d5-eq-p','d5-eq-l')"><div class="cb"></div><div class="ci-lbl">HITH drug chart and clinical notes</div></div>
+        <div class="ci" onclick="chk(this,'d5-eq-p','d5-eq-l')"><div class="cb"></div><div class="ci-lbl">IV cannula removal dressing kit</div></div>
+        <div class="ci" onclick="chk(this,'d5-eq-p','d5-eq-l')"><div class="cb"></div><div class="ci-lbl">Discharge paperwork · transfer-of-care documentation for RVEEH</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pre-infusion D5 -->
+  <div class="sec" id="d5-pre">
+    <div class="sec-hdr" onclick="tog('d5-pre')">
+      <div class="sec-ico si-g">👤</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Pre-Infusion Assessment</div><div class="sec-sub">On arrival at patient's home</div></div>
+      <div class="prog-pill" id="d5-pre-p">0/8</div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="cl" id="d5-pre-l">
+        <div class="ci crit" onclick="chk(this,'d5-pre-p','d5-pre-l')"><div class="cb"></div><div class="ci-lbl">Confirm patient identity — 2 identifiers (name + DOB)</div></div>
+        <div class="ci crit" onclick="chk(this,'d5-pre-p','d5-pre-l')"><div class="cb"></div><div class="ci-lbl">Allergy check — any new concerns since Day 4</div></div>
+        <div class="ci" onclick="chk(this,'d5-pre-p','d5-pre-l')"><div class="cb"></div><div class="ci-lbl">Verify prescription on drug chart — Day 5 authorised by HITH Consultant</div></div>
+        <div class="ci" onclick="chk(this,'d5-pre-p','d5-pre-l')"><div class="cb"></div><div class="ci-lbl">Baseline vital signs: BP · HR · RR · SpO₂ · Temperature</div></div>
+        <div class="ci warn" onclick="chk(this,'d5-pre-p','d5-pre-l')"><div class="cb"></div><div class="ci-lbl">Baseline BGL — all patients<span class="cn">⚠ Day 5 cumulative steroid effect — heightened hyperglycaemia risk</span></div></div>
+        <div class="ci" onclick="chk(this,'d5-pre-p','d5-pre-l')"><div class="cb"></div><div class="ci-lbl">Cannula assessment — patency and site condition</div></div>
+        <div class="ci" onclick="chk(this,'d5-pre-p','d5-pre-l')"><div class="cb"></div><div class="ci-lbl">Review side effects from Day 4 — document any new or worsening concerns</div></div>
+        <div class="ci" onclick="chk(this,'d5-pre-p','d5-pre-l')"><div class="cb"></div><div class="ci-lbl">Visual acuity assessment (when indicated)</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Drug preparation D5 -->
+  <div class="sec" id="d5-prep">
+    <div class="sec-hdr" onclick="tog('d5-prep')">
+      <div class="sec-ico si-p">⚗️</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Drug Preparation</div><div class="sec-sub">Reconstitution · labelling · priming</div></div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="steps-list">
+        <div class="step-row"><div class="step-n">1</div><div class="step-c"><div class="step-t">Hand hygiene — don gloves</div></div></div>
+        <div class="step-row"><div class="step-n">2</div><div class="step-c"><div class="step-t">Inspect vial</div><div class="step-d">Check expiry, integrity. Remove plastic cap.</div></div></div>
+        <div class="step-row"><div class="step-n">3</div><div class="step-c"><div class="step-t">Activate Act-O-Vial</div><div class="step-d">Press activator button to release diluent into powder chamber.</div></div></div>
+        <div class="step-row"><div class="step-n">4</div><div class="step-c"><div class="step-t">Mix gently — inspect</div><div class="step-d">Rotate to dissolve. Must be clear/pale yellow. No particles. Do not shake.</div></div></div>
+        <div class="step-row"><div class="step-n">5</div><div class="step-c"><div class="step-t">Transfer to NaCl 0.9% 100 mL bag</div><div class="step-d">Aseptic technique. Mix gently after transfer.</div></div></div>
+        <div class="step-row"><div class="step-n">6</div><div class="step-c"><div class="step-t">Label bag · Prime IV set</div><div class="step-d">Drug · dose · diluent · date/time · expiry (use within 12h) · initials. Prime set fully — no air bubbles.</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Administration D5 -->
+  <div class="sec" id="d5-adm">
+    <div class="sec-hdr" onclick="tog('d5-adm')">
+      <div class="sec-ico si-n">💉</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Administration &amp; Timer</div><div class="sec-sub">HITH Visit 4 — Final infusion</div></div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="cl">
+        <div class="ci" onclick="chk(this,null,null)"><div class="cb"></div><div class="ci-lbl">Pre-flush cannula — NaCl 0.9% 10 mL, confirm patency</div></div>
+        <div class="ci" onclick="chk(this,null,null)"><div class="cb"></div><div class="ci-lbl">Connect primed IV set to cannula</div></div>
+        <div class="ci" onclick="chk(this,null,null)"><div class="cb"></div><div class="ci-lbl">Set infusion rate per selection below</div></div>
+        <div class="ci" onclick="chk(this,null,null)"><div class="cb"></div><div class="ci-lbl">Document start time on drug chart and observation chart</div></div>
+      </div>
+      <div class="timer-card">
+        <div class="tmr-eye">Select infusion duration</div>
+        <div class="rate-grp">
+          <div class="rate-btn" id="r5-30" onclick="setRate(5,30,this)">30 min<span class="rs">200 mL/hr</span></div>
+          <div class="rate-btn sel" id="r5-60" onclick="setRate(5,60,this)">60 min<span class="rs">100 mL/hr</span></div>
+          <div class="rate-btn" id="r5-120" onclick="setRate(5,120,this)">2 hr<span class="rs">Cardiac risk</span></div>
+        </div>
+        <div class="tmr-digits" id="tmr-5">60:00</div>
+        <div class="tmr-sub" id="tmr-sub-5">100 mL/hr · Start timer when infusion begins</div>
+        <div class="tmr-btns">
+          <button class="tb pr" onclick="startTmr(5)">▶ Start</button>
+          <button class="tb" onclick="pauseTmr(5)">⏸ Pause</button>
+          <button class="tb" onclick="resetTmr(5)">↺ Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monitoring D5 -->
+  <div class="sec" id="d5-mon">
+    <div class="sec-hdr" onclick="tog('d5-mon')">
+      <div class="sec-ico si-a">📊</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Monitoring During Infusion</div><div class="sec-sub">Vitals · BGL · visual acuity · pathology</div></div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <table class="vt">
+        <tr><th>Timepoint</th><th>Observations required</th></tr>
+        <tr><td><span class="t-pill">Baseline</span></td><td>BP · HR · RR · SpO₂ · Temp · BGL · Visual acuity (when indicated)</td></tr>
+        <tr><td><span class="t-pill">15 min</span></td><td>BP · HR · SpO₂ · BGL · Adverse reaction assessment</td></tr>
+        <tr><td><span class="t-pill">30 min</span></td><td>BP · HR · SpO₂</td></tr>
+        <tr><td><span class="t-pill">End of infusion</span></td><td>BP · HR · SpO₂ · Temp · BGL</td></tr>
+        <tr><td><span class="t-pill">30 min post</span></td><td>BP · HR · SpO₂ · Final clinical review before discharge</td></tr>
+      </table>
+      <div class="ib b" style="margin-top:12px;"><strong>Pathology — U&amp;Es (Day 5)</strong>Collect blood for Urea &amp; Electrolytes during infusion. Label and dispatch. Include in discharge documentation for RVEEH.</div>
+      <div class="ib b" style="margin-top:10px;"><strong>Visual Acuity</strong>Conduct if indicated. Document clearly — final result to be included in discharge summary for RVEEH.</div>
+      <div class="ib a" style="margin-top:10px;"><strong>Blood Glucose</strong>Day 5 carries the highest cumulative steroid risk. Monitor BGL closely. BGL &gt;15 mmol/L → contact HITH medical team before continuing.</div>
+    </div>
+  </div>
+
+  <!-- Adverse effects D5 -->
+  <div class="sec" id="d5-ae">
+    <div class="sec-hdr" onclick="tog('d5-ae')">
+      <div class="sec-ico si-r">⚠️</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Adverse Effects</div><div class="sec-sub">Recognition &amp; action</div></div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="ae r">
+        <div class="ae-hdr"><span class="ae-sev r">STOP · CALL 000</span></div>
+        <div class="ae-nm">Anaphylaxis</div>
+        <div class="ae-sg">Urticaria · angioedema · bronchospasm · hypotension · loss of consciousness</div>
+        <div class="ae-act r">→ STOP immediately · 000 · Lay flat · Anaphylaxis kit · Adrenaline IM if trained</div>
+      </div>
+      <div class="ae r">
+        <div class="ae-hdr"><span class="ae-sev r">STOP · CALL HMO</span></div>
+        <div class="ae-nm">Cardiac Arrhythmia</div>
+        <div class="ae-sg">Palpitations · irregular pulse · chest pain · syncope</div>
+        <div class="ae-act r">→ STOP · Call HITH HMO (9929 8788) · Consider 000</div>
+      </div>
+      <div class="ae a">
+        <div class="ae-hdr"><span class="ae-sev a">CALL HMO</span></div>
+        <div class="ae-nm">Hyperglycaemia (BGL &gt;15) · Neuropsychiatric · Severe BP</div>
+        <div class="ae-act a">→ Contact HITH medical team for direction</div>
+      </div>
+      <div class="ae b">
+        <div class="ae-hdr"><span class="ae-sev b">EXPECTED — REASSURE</span></div>
+        <div class="ae-nm">Metallic taste · Flushing · Insomnia · Mild mood changes · Indigestion</div>
+        <div class="ae-act b">→ Reassure patient. Document. Expected and self-limiting.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post-infusion + DISCHARGE D5 -->
+  <div class="sec" id="d5-post">
+    <div class="sec-hdr" onclick="tog('d5-post')">
+      <div class="sec-ico si-g">🏁</div>
+      <div class="sec-ttl-grp"><div class="sec-ttl">Post-Infusion &amp; Discharge</div><div class="sec-sub">Final day — handover, documentation, transfer of care</div></div>
+      <div class="prog-pill" id="d5-post-p">0/9</div>
+      <span class="sec-chev">▼</span>
+    </div>
+    <div class="sec-body">
+      <div class="cl" id="d5-post-l">
+        <div class="ci" onclick="chk(this,'d5-post-p','d5-post-l')"><div class="cb"></div><div class="ci-lbl">Infusion complete — clamp IV line / close administration set</div></div>
+        <div class="ci" onclick="chk(this,'d5-post-p','d5-post-l')"><div class="cb"></div><div class="ci-lbl">Post-flush: NaCl 0.9% 10 mL</div></div>
+        <div class="ci" onclick="chk(this,'d5-post-p','d5-post-l')"><div class="cb"></div><div class="ci-lbl">30-min post-infusion obs: BP · HR · SpO₂ · BGL · final clinical review</div></div>
+        <div class="ci" onclick="chk(this,'d5-post-p','d5-post-l')"><div class="cb"></div><div class="ci-lbl">Remove IV cannula — apply pressure, dressing, confirm haemostasis</div></div>
+        <div class="ci" onclick="chk(this,'d5-post-p','d5-post-l')"><div class="cb"></div><div class="ci-lbl">Confirm U&amp;E sample labelled and dispatched</div></div>
+        <div class="ci" onclick="chk(this,'d5-post-p','d5-post-l')"><div class="cb"></div><div class="ci-lbl">Complete all documentation: MRO · drug chart · obs chart · visual acuity · pathology</div></div>
+        <div class="ci warn" onclick="chk(this,'d5-post-p','d5-post-l')"><div class="cb"></div><div class="ci-lbl">Notify HITH Consultant — handover of Day 5 completion and patient status<span class="cn">⚠ Mandatory before discharge from HITH</span></div></div>
+        <div class="ci warn" onclick="chk(this,'d5-post-p','d5-post-l')"><div class="cb"></div><div class="ci-lbl">Complete discharge summary + MRO documentation for RVEEH transfer of care<span class="cn">⚠ Email to relevant medical team at RVEEH</span></div></div>
+        <div class="ci" onclick="chk(this,'d5-post-p','d5-post-l')"><div class="cb"></div><div class="ci-lbl">Dispose of sharps · bag clinical waste · remove gloves · decontaminate equipment</div></div>
+      </div>
+      <div class="ib a" style="margin-top:12px;"><strong>Discharge Decision</strong>If patient has progressed as expected → discharge from HITH back to referring team (RVEEH) in consultation with HITH Consultant. If clinical concerns remain → liaise with HITH Consultant before discharging.</div>
+    </div>
+  </div>
+
+</div>
+</div><!-- /day 5 -->
+
+<!-- ═══ CONTACTS MODAL ═══ -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-ttl">🚨 Emergency Contacts</div>
+      <button class="modal-close" onclick="document.getElementById('modal').classList.remove('open')">Close</button>
+    </div>
+    <div class="ct-row">
+      <div><div class="ct-lbl">Life-threatening emergency</div><div class="ct-nm">Ambulance / Triple Zero</div></div>
+      <a href="tel:000" class="call-btn r">📞 000</a>
+    </div>
+    <div class="ct-row">
+      <div><div class="ct-lbl">HITH Medical Staff — E+E HMO</div><div class="ct-nm">On-call medical officer</div></div>
+      <a href="tel:+61399298788" class="call-btn">📞 9929 8788</a>
+    </div>
+    <div class="ct-row">
+      <div><div class="ct-lbl">E+E Inpatient Ward</div><div class="ct-nm">General ward line</div></div>
+      <a href="tel:+61399298782" class="call-btn">📞 9929 8782</a>
+    </div>
+    <div class="ct-row">
+      <div><div class="ct-lbl">E+E Inpatient Ward NUM</div><div class="ct-nm">Nurse Unit Manager</div></div>
+      <a href="tel:+61399298779" class="call-btn">📞 9929 8779</a>
+    </div>
+    <div class="ib r" style="margin-top:14px;line-height:1.55;">
+      <strong>Anaphylaxis Protocol</strong>
+      STOP infusion immediately · Call 000 · Lay patient flat, legs elevated · Activate anaphylaxis kit · Adrenaline 500 mcg IM anterolateral thigh if trained
+    </div>
+    <div class="modal-footer">
+      SVHM HITH SOP — IV Methylprednisolone Sodium Succinate (Dec 2023)<br>
+      Clinical aid only. Always follow current SVHM policy and prescriber orders.
+    </div>
+  </div>
+</div>
+
+<!-- ═══ STICKY ESCALATION BAR ═══ -->
+<div class="esc-bar" onclick="document.getElementById('modal').classList.add('open')">
+  <span>🚨 ESCALATE &amp; CONTACTS</span>
+</div>
+
+<script>
+// ─── Day switching ───
+let curDay = 2;
+function setDay(d) {
+  curDay = d;
+  document.querySelectorAll('.day-pane').forEach(p => p.classList.remove('visible'));
+  document.getElementById('pane-'+d).classList.add('visible');
+  document.querySelectorAll('.d-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-'+d).classList.add('active');
+}
+
+// ─── Accordion ───
+function tog(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+// ─── Checklist ───
+function chk(item, pillId, listId) {
+  item.classList.toggle('chk');
+  if (pillId && listId) updPill(pillId, listId);
+}
+function updPill(pid, lid) {
+  const list = document.getElementById(lid);
+  const total = list.querySelectorAll('.ci').length;
+  const done  = list.querySelectorAll('.ci.chk').length;
+  const pill  = document.getElementById(pid);
+  pill.textContent = done + '/' + total;
+  pill.classList.toggle('done', done === total);
+}
+
+// ─── Pathology checker ───
+function chkPath(day) {
+  const naId = 'na'+day, kId = 'k'+day;
+  const naf = 'na'+day+'-f', kf = 'k'+day+'-f', res = 'path-res-'+day;
+  const na = parseFloat(document.getElementById(naId).value);
+  const k  = parseFloat(document.getElementById(kId).value);
+  const resEl = document.getElementById(res);
+  if (isNaN(na) || isNaN(k)) {
+    resEl.className = 'path-res';
+    document.getElementById(naf).className = 'path-f';
+    document.getElementById(kf).className  = 'path-f';
+    return;
+  }
+  const naOk = na >= 135 && na <= 145;
+  const kOk  = k  >= 3.5 && k  <= 5.0;
+  document.getElementById(naf).className = 'path-f ' + (naOk ? 'ok' : 'bad');
+  document.getElementById(kf).className  = 'path-f ' + (kOk  ? 'ok' : 'bad');
+  const allOk = naOk && kOk;
+  resEl.className = 'path-res show ' + (allOk ? 'ok' : 'bad');
+  resEl.textContent = allOk
+    ? '✓ Electrolytes within normal limits — safe to proceed'
+    : '⚠ One or more electrolytes outside normal limits — contact HITH medical team. Do not attend patient.';
+}
+
+// ─── Timers ───
+const timers = {
+  2: { secs: 3600, total: 3600, running: false, interval: null, mins: 60 },
+  3: { secs: 3600, total: 3600, running: false, interval: null, mins: 60 },
+  4: { secs: 3600, total: 3600, running: false, interval: null, mins: 60 },
+  5: { secs: 3600, total: 3600, running: false, interval: null, mins: 60 }
+};
+const rateDesc = {
+  30:  '200 mL/hr · Rapid — confirm with prescriber',
+  60:  '100 mL/hr · Standard rate',
+  120: '50 mL/hr · Cardiac arrhythmia risk — 2-hour rate'
+};
+
+function setRate(day, mins, btn) {
+  const t = timers[day];
+  if (t.running) return;
+  t.mins = mins;
+  t.secs = mins * 60;
+  t.total = mins * 60;
+  updDisp(day);
+  document.getElementById('tmr-sub-'+day).textContent = rateDesc[mins];
+  const scope = 'd'+day+'-adm';
+  document.querySelectorAll('#'+scope+' .rate-btn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+function updDisp(day) {
+  const t = timers[day];
+  const m = Math.floor(t.secs / 60), s = t.secs % 60;
+  document.getElementById('tmr-'+day).textContent =
+    String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+}
+function startTmr(day) {
+  const t = timers[day];
+  if (t.running || t.secs <= 0) return;
+  t.running = true;
+  t.interval = setInterval(() => {
+    t.secs--;
+    updDisp(day);
+    if (t.secs <= 0) {
+      clearInterval(t.interval);
+      t.running = false;
+      document.getElementById('tmr-'+day).textContent = '00:00';
+      document.getElementById('tmr-sub-'+day).textContent = '✓ Infusion complete — commence post-infusion observations';
+      if (navigator.vibrate) navigator.vibrate([400,150,400,150,400]);
+    }
+  }, 1000);
+}
+function pauseTmr(day) {
+  const t = timers[day];
+  clearInterval(t.interval);
+  t.running = false;
+}
+function resetTmr(day) {
+  const t = timers[day];
+  clearInterval(t.interval);
+  t.running = false;
+  t.secs = t.mins * 60;
+  t.total = t.secs;
+  updDisp(day);
+  document.getElementById('tmr-sub-'+day).textContent = rateDesc[t.mins];
+}
+
+// ─── Modal close on backdrop ───
+function closeModal(e) {
+  if (e.target === document.getElementById('modal')) {
+    document.getElementById('modal').classList.remove('open');
+  }
+}
+</script>
+</body>
+</html>

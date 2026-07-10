@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>CVAD Occlusion Troubleshooter</title>
+<style>
+  :root {
+    --navy:     #0D2D5E;
+    --navy-mid: #164080;
+    --blue:     #1A6FAF;
+    --blue-lt:  #E5F0FA;
+    --bg:       #EEF2F7;
+    --surface:  #FFFFFF;
+    --amber:    #C97A00;
+    --amber-bg: #FFFBEB;
+    --amber-bd: #FDE68A;
+    --red:      #C91B1B;
+    --red-bg:   #FEF2F2;
+    --red-bd:   #FEB4B4;
+    --green:    #14803D;
+    --green-bg: #F0FDF4;
+    --green-bd: #A7F3C3;
+    --muted:    #6B7280;
+    --border:   #DDE3EC;
+    --text:     #1B2333;
+    --r:        13px;
+    --r-sm:     8px;
+    --si-b:#DBEAFE; --si-a:#FEF3C7; --si-g:#DCFCE7;
+    --si-r:#FEE2E2; --si-p:#EDE9FE; --si-n:#E0ECF8;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;padding-bottom:80px}
+
+  /* HEADER */
+  .app-header{background:var(--navy);color:white;padding:14px 16px 0;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+  .header-eyebrow{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;opacity:.65;margin-bottom:2px}
+  .header-title{font-size:19px;font-weight:800;letter-spacing:-.3px;line-height:1.2}
+  .header-sub{font-size:12px;opacity:.65;margin-top:2px}
+  .header-row{display:flex;align-items:center;gap:12px;padding-bottom:12px}
+  .header-icon-wrap{width:36px;height:36px;background:rgba(255,255,255,.12);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .progress-bar-wrap{background:rgba(255,255,255,.15);height:3px;overflow:hidden}
+  .progress-bar-fill{height:100%;background:white;transition:width .4s ease}
+
+  /* LAYOUT */
+  .main{max-width:540px;margin:0 auto;padding:14px 14px 0}
+
+  /* CARD */
+  .card{background:var(--surface);border-radius:var(--r);box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:12px;overflow:hidden;animation:slideUp .25s ease;border:1px solid var(--border)}
+  .card-body{padding:16px}
+  @keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .card-blue  {border-left:4px solid var(--blue); background:var(--blue-lt)}
+  .card-amber {border-left:4px solid var(--amber);background:var(--amber-bg)}
+  .card-red   {border-left:4px solid var(--red);  background:var(--red-bg)}
+  .card-green {border-left:4px solid var(--green);background:var(--green-bg)}
+  .card-navy  {border-left:4px solid var(--navy); background:var(--si-n)}
+  .card-purple{border-left:4px solid #7C3AED;     background:var(--si-p)}
+
+  /* SECTION ICON ROW */
+  .sir{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .si{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+  .si-b{background:var(--si-b)}.si-a{background:var(--si-a)}.si-g{background:var(--si-g)}
+  .si-r{background:var(--si-r)}.si-p{background:var(--si-p)}.si-n{background:var(--si-n)}
+  .st{font-size:15px;font-weight:700;color:var(--text);line-height:1.25}
+  .ss{font-size:12px;color:var(--muted);margin-top:1px}
+
+  /* TEXT */
+  .eyebrow{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .question{font-size:15px;font-weight:700;line-height:1.4;color:var(--text);margin-bottom:4px}
+  .question-sub{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:14px}
+
+  /* CHECKLIST */
+  .cl{background:var(--surface);border-radius:var(--r-sm);border:1px solid var(--border);overflow:hidden;margin-bottom:12px}
+  .cl-hdr{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);padding:8px 12px 6px;border-bottom:1px solid var(--border);background:#FAFCFF}
+  .ci{display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:1.45;color:var(--text);padding:8px 12px;border-bottom:1px solid var(--border)}
+  .ci:last-child{border-bottom:none}
+  .cdot{width:6px;height:6px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:5px}
+
+  /* BUTTONS */
+  .btn-group{display:flex;flex-direction:column;gap:9px}
+  .btn{width:100%;border:none;border-radius:var(--r-sm);padding:14px 16px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:opacity .15s,transform .1s;text-align:left;line-height:1.3}
+  .btn:active{transform:scale(.98);opacity:.9}
+  .btn-primary{background:var(--navy);color:white}
+  .btn-blue{background:var(--blue);color:white}
+  .btn-amber{background:var(--amber);color:white}
+  .btn-red{background:var(--red);color:white}
+  .btn-green{background:var(--green);color:white}
+  .btn-outline{background:var(--surface);color:var(--text);border:1.5px solid var(--border)}
+  .btn-outline:hover{border-color:var(--blue);color:var(--blue)}
+  .bchev{font-size:18px;opacity:.6;flex-shrink:0;margin-left:8px}
+  .blbl{display:flex;flex-direction:column;gap:1px}
+  .blbl .bsub{font-size:11px;font-weight:400;opacity:.75}
+
+  /* INFO BOXES */
+  .ib{border-radius:var(--r-sm);padding:11px 13px;font-size:13px;line-height:1.5;margin-bottom:10px;border-left:3px solid}
+  .ib strong{display:block;font-size:11px;letter-spacing:.4px;margin-bottom:2px}
+  .ib.b{background:var(--blue-lt);border-color:var(--blue);color:var(--text)}.ib.b strong{color:var(--blue)}
+  .ib.a{background:var(--amber-bg);border-color:var(--amber);color:var(--text)}.ib.a strong{color:var(--amber)}
+  .ib.r{background:var(--red-bg);border-color:var(--red);color:var(--text)}.ib.r strong{color:var(--red)}
+  .ib.g{background:var(--green-bg);border-color:var(--green);color:var(--text)}.ib.g strong{color:var(--green)}
+
+  /* OUTCOME */
+  .oico{font-size:34px;margin-bottom:8px;display:block}
+  .otitle{font-size:19px;font-weight:800;line-height:1.25;margin-bottom:8px;color:var(--text)}
+  .obody{font-size:13px;line-height:1.6;color:var(--muted)}
+  .obody ul{padding-left:16px;margin-top:6px}
+  .obody li{margin-bottom:5px}
+  .obody strong{color:var(--text)}
+
+  /* CINAS TABLE */
+  .ctbl{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:12px;border-radius:var(--r-sm);overflow:hidden}
+  .ctbl th{background:var(--navy);color:white;padding:8px 10px;text-align:left;font-weight:700;font-size:11px;letter-spacing:.4px}
+  .ctbl td{padding:8px 10px;border-bottom:1px solid var(--border)}
+  .ctbl tr:last-child td{border-bottom:none}
+  .ctbl tr:nth-child(even) td{background:#FAFCFF}
+
+  /* DOSE BOX */
+  .dbox{background:var(--si-n);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;font-size:13px;line-height:1.7;margin:10px 0;color:var(--text)}
+  .dbox b{color:var(--navy);font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;display:block;margin-top:8px;margin-bottom:0}
+  .dbox b:first-child{margin-top:0}
+
+  /* BACK / RESTART */
+  .back-btn{background:none;border:none;color:var(--muted);font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:4px;padding:6px 0 2px;margin-bottom:4px}
+  .back-btn:hover{color:var(--blue)}
+  .restart-btn{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:12px 16px;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;margin-top:4px}
+  .restart-btn:hover{border-color:var(--navy);color:var(--navy)}
+  .disclaimer{font-size:11px;color:var(--muted);font-style:italic;text-align:center;padding:10px 8px 0;line-height:1.5;margin-top:8px}
+  .disclaimer a{color:var(--blue)}
+  .screen{animation:fadeIn .2s ease}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="header-row">
+    <div class="header-icon-wrap">🩺</div>
+    <div>
+      <div class="header-eyebrow">SVHM HITH — Vascular Access</div>
+      <div class="header-title">CVAD Occlusion</div>
+      <div class="header-sub">CNSA Patency Management Algorithm</div>
+    </div>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+  </div>
+</div>
+
+<div class="main" id="app"></div>
+
+<script>
+let hist = [];
+
+const S = {
+
+  start:{progress:0,render:()=>`
+    <div class="card card-body">
+      <div class="eyebrow">CNSA Algorithm \u00b7 Step 1</div>
+      <div class="question">Which vascular access device is affected?</div>
+      <div class="question-sub">Select the device type to begin the occlusion assessment pathway.</div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="go('cvad_std')">
+          <div class="blbl">Central Venous Access Device (CVAD)<span class="bsub">PICC, port, tunnelled or non-tunnelled CVC</span></div>
+          <span class="bchev">\u203a</span>
+        </button>
+        <button class="btn btn-outline" onclick="go('pivc')">
+          <div class="blbl">Peripheral IV Cannula (PIVC)<span class="bsub">Standard peripheral cannula</span></div>
+          <span class="bchev">\u203a</span>
+        </button>
+      </div>
+    </div>
+    <div class="disclaimer">Based on the <a href="https://www.cnsa.org.au/resource/patency-management-algorithm-for-central-venous-access-devices.html" target="_blank">CNSA Patency Management Algorithm</a>. This tool supports\u2014not replaces\u2014clinical judgment.</div>`},
+
+  pivc:{progress:100,render:()=>`
+    <div class="card card-red card-body">
+      <div class="sir"><div class="si si-r">&#x1F6AB;</div><div><div class="st">PIVC \u2014 Remove the Cannula</div><div class="ss">Conclusion \u00b7 No further management</div></div></div>
+      <div class="ib r"><strong>Expert Consensus</strong>No evidence supports management of occluded PIVCs. Remove as the most resource-efficient approach. Do not flush with force.</div>
+      <div class="obody"><ul><li>Remove PIVC promptly</li><li>Document removal and reason</li><li>Re-site with new PIVC as clinically required</li></ul></div>
+    </div>
+    <div class="card card-navy card-body">
+      <div class="eyebrow">Prevention \u2014 Next Insertion</div>
+      <div class="question" style="font-size:14px;margin-bottom:10px">Optimise patency for re-siting</div>
+      <div class="cl"><div class="cl-hdr">Best Practice</div>${chk(['Smallest gauge for prescribed therapy (e.g. 20\u201324G)','Stable insertion site: forearm, avoid areas of flexion','Vein visualisation technology (near-infrared or ultrasound)','Adequate securement and bordered dressing','Short extension tubing with bonded needleless connector','Flush/lock with 0.9% NaCl per protocol'])}</div>
+    </div>
+    ${rstrt()}`},
+
+  cvad_std:{progress:10,render:()=>`
+    <div class="card card-navy card-body">
+      <div class="sir"><div class="si si-n">&#x1F4CB;</div><div><div class="st">Confirm Standard Care</div><div class="ss">Every patient \u00b7 Every time \u00b7 Every CVAD</div></div></div>
+      <div class="cl"><div class="cl-hdr">Standard Care Checklist</div>${chk(['Educated and competent clinician managing CVAD','Catheter tip: cavoatrial junction / lower \u2153 SVC / upper right atrium (or IVC above diaphragm for femoral)','10 mL or 20 mL syringes only','Pulsatile (start-stop) flush with 0.9% NaCl \u2014 adults 10 mL; 20 mL post blood sampling or viscous infusions','Paediatrics: at least double the CVAD system volume','Lock every lumen per CVAD type and frequency'])}</div>
+    </div>
+    <div class="card card-body">
+      <div class="question">Proceed to patency assessment?</div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="go('cinas')">
+          <div class="blbl">Yes \u2014 Assess CVAD patency now<span class="bsub">Standard care confirmed</span></div>
+          <span class="bchev">\u203a</span>
+        </button>
+      </div>
+    </div>`},
+
+  cinas:{progress:20,render:()=>`
+    <div class="card card-blue card-body">
+      <div class="sir"><div class="si si-b">&#x1F52C;</div><div><div class="st">CINAS Patency Assessment</div><div class="ss">Catheter Injection and Aspiration Classification</div></div></div>
+      <div class="ib b"><strong>Assess Both</strong>Assess aspiration AND injection ability of the CVAD. Investigate any deviation from easy aspiration and injection.</div>
+      <table class="ctbl">
+        <tr><th>Code</th><th>Injection</th><th>Aspiration</th></tr>
+        <tr><td><strong>IN1 / AS1</strong></td><td>Easy</td><td>Easy</td></tr>
+        <tr><td><strong>IN2 / AS2</strong></td><td>Difficult</td><td>Difficult</td></tr>
+        <tr><td><strong>IN3 / AS3</strong></td><td>Impossible</td><td>Impossible</td></tr>
+        <tr><td><strong>Inx / ASx</strong></td><td colspan="2">Unknown / not assessed</td></tr>
+      </table>
+    </div>
+    <div class="card card-body">
+      <div class="question">What is the CINAS result?</div>
+      <div class="btn-group">
+        <button class="btn btn-green" onclick="go('in1')"><div class="blbl">IN1 / AS1 \u2014 Easy injection and aspiration<span class="bsub">CVAD is patent</span></div><span class="bchev">\u203a</span></button>
+        <button class="btn btn-amber" onclick="go('in2')"><div class="blbl">IN2 / AS2 \u2014 Difficult injection or aspiration<span class="bsub">Partial occlusion suspected</span></div><span class="bchev">\u203a</span></button>
+        <button class="btn btn-red"   onclick="go('in3')"><div class="blbl">IN3 / AS3 \u2014 Impossible injection or aspiration<span class="bsub">Complete occlusion</span></div><span class="bchev">\u203a</span></button>
+        <button class="btn btn-outline" onclick="go('inx')"><div class="blbl">Inx / ASx \u2014 Unknown / unable to assess</div><span class="bchev">\u203a</span></button>
+      </div>
+    </div>`},
+
+  in1:{progress:100,render:()=>`
+    <div class="card card-green card-body">
+      <span class="oico">\u2705</span>
+      <div class="otitle">CVAD is Patent \u2014 Resume Use</div>
+      <div class="ib g"><strong>CINAS IN1 / AS1</strong>Easy injection and easy aspiration confirmed. No occlusion is present.</div>
+      <div class="obody"><ul><li>Continue standard care and flush/lock protocol</li><li>Document assessment findings</li><li>Reassess if symptoms change</li></ul></div>
+    </div>
+    ${rstrt()}`},
+
+  inx:{progress:25,render:()=>`
+    <div class="card card-amber card-body">
+      <div class="sir"><div class="si si-a">&#x26A0;&#xFE0F;</div><div><div class="st">Patency Unknown \u2014 Inx / ASx</div><div class="ss">Unable to confirm aspiration or injection status</div></div></div>
+      <div class="ib a"><strong>Act Promptly</strong>Avoid delay in interventions when patency is uncertain. Investigate the cause.</div>
+    </div>
+    <div class="card card-body">
+      <div class="question">Proceed to occlusion cause assessment?</div>
+      <div class="btn-group">
+        <button class="btn btn-amber" onclick="go('mech')">Yes \u2014 Investigate cause of occlusion <span class="bchev">\u203a</span></button>
+      </div>
+    </div>`},
+
+  in2:{progress:30,render:()=>`
+    <div class="card card-amber card-body">
+      <div class="sir"><div class="si si-a">&#x26A0;&#xFE0F;</div><div><div class="st">Partial Occlusion \u2014 IN2 / AS2</div><div class="ss">Difficult injection or aspiration</div></div></div>
+      <div class="cl"><div class="cl-hdr">Signs of Partial Occlusion \u2014 Recognise any?</div>${chk(['No blood return but flushes easily','Flashback only \u2014 no frank blood return','Slow blood return / increased resistance on flushing','Catheter tip not at cavoatrial junction on CXR','Sudden resistance after medication administration','Drug precipitation or blood remnants in catheter lumen','Prolonged creasing in catheter lumen'])}</div>
+      <div class="ib a"><strong>Act Promptly</strong>Avoid delay in interventions.</div>
+    </div>
+    <div class="card card-body">
+      <div class="question">Investigate the cause.</div>
+      <div class="btn-group"><button class="btn btn-amber" onclick="go('mech')">Proceed to cause assessment <span class="bchev">\u203a</span></button></div>
+    </div>`},
+
+  in3:{progress:30,render:()=>`
+    <div class="card card-red card-body">
+      <div class="sir"><div class="si si-r">&#x1F6A8;</div><div><div class="st">Complete Occlusion \u2014 IN3 / AS3</div><div class="ss">Impossible injection and aspiration</div></div></div>
+      <div class="cl"><div class="cl-hdr">Signs Present</div>${chk(['No blood return AND inability to inject fluids'])}</div>
+      <div class="ib r"><strong>Urgent Action Required</strong>Act promptly \u2014 do not delay interventions.</div>
+    </div>
+    <div class="card card-body">
+      <div class="question">Investigate the cause \u2014 begin with mechanical check.</div>
+      <div class="btn-group"><button class="btn btn-red" onclick="go('mech')">Proceed to cause assessment <span class="bchev">\u203a</span></button></div>
+    </div>`},
+
+  mech:{progress:40,render:()=>`
+    <div class="card card-blue card-body">
+      <div class="sir"><div class="si si-b">&#x1F527;</div><div><div class="st">Step 1 \u2014 Mechanical Occlusion</div><div class="ss">Check CVAD, IV lines, and patient factors</div></div></div>
+      <div class="cl"><div class="cl-hdr">CVAD Factors</div>${chk(['Closed clamps on catheter lumen or non-coring TIVAD needle','Kinked catheter under dressing','Malpositioned, angled, or inappropriate length non-coring TIVAD needle','Change in catheter length','Blood in catheter lumen'])}</div>
+      <div class="cl"><div class="cl-hdr">IV Administration Lines</div>${chk(['Kinks, twists, or closed clamps in IV lines (including additive lines and in-line filters)','Blood in needleless connector'])}</div>
+      <div class="cl"><div class="cl-hdr">Patient Factors</div>${chk(['Patient position causing occlusion','Catheter tip malposition or adjacent to vein wall'])}</div>
+    </div>
+    <div class="card card-body">
+      <div class="question">Is a mechanical cause identified?</div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="go('mech_int')"><div class="blbl">Yes \u2014 Mechanical cause found<span class="bsub">Proceed to mechanical interventions</span></div><span class="bchev">\u203a</span></button>
+        <button class="btn btn-outline" onclick="go('dvt')"><div class="blbl">No \u2014 No mechanical cause<span class="bsub">Check for DVT next</span></div><span class="bchev">\u203a</span></button>
+      </div>
+    </div>`},
+
+  mech_int:{progress:55,render:()=>`
+    <div class="card card-blue card-body">
+      <div class="sir"><div class="si si-b">&#x1F6E0;&#xFE0F;</div><div><div class="st">Mechanical Interventions</div><div class="ss">Consult medical staff \u00b7 Act promptly</div></div></div>
+      <div class="cl"><div class="cl-hdr">Actions to Attempt</div>${chk(['Change patient position','Ask patient to cough or deep breathe','Open clamps on catheter and IV lines','Change dressing and inspect catheter under dressing','Replace blocked needleless connectors or in-line filters','Re-access TIVAD (if applicable)','Replace IV administration line(s)'])}</div>
+      <div class="cl"><div class="cl-hdr">Investigations to Consider</div>${chk(['Flow studies: kink, occlusion, fibrin sheath/sleeve, catheter fracture','CXR: suspected catheter tip malposition or pinch-off syndrome'])}</div>
+      <div class="ib b"><strong>Consult Medical Staff</strong>For mechanical interventions and investigation orders.</div>
+    </div>
+    <div class="card card-body">
+      <div class="question">After interventions \u2014 CINAS result now?</div>
+      <div class="btn-group">
+        <button class="btn btn-green" onclick="go('restored')"><div class="blbl">IN1 / AS1 \u2014 Patency restored<span class="bsub">Easy injection and aspiration</span></div><span class="bchev">\u203a</span></button>
+        <button class="btn btn-red" onclick="go('dvt')"><div class="blbl">Still occluded \u2014 interventions not successful<span class="bsub">Proceed to further assessment</span></div><span class="bchev">\u203a</span></button>
+      </div>
+    </div>`},
+
+  dvt:{progress:50,render:()=>`
+    <div class="card card-red card-body">
+      <div class="sir"><div class="si si-r">&#x1FA78;</div><div><div class="st">Step 2 \u2014 DVT Assessment</div><div class="ss">Side of catheter insertion</div></div></div>
+      <div class="cl"><div class="cl-hdr">DVT Signs &amp; Symptoms</div>${chk(['Pain \u00b1 swelling (arm, chest wall, neck, face, jaw)','Discoloration of the extremity','Altered sensation of the extremity','Reduced function in the extremity','Engorged peripheral veins on extremity or chest wall (ipsilateral to catheter)'])}</div>
+    </div>
+    <div class="card card-body">
+      <div class="question">Are DVT signs present?</div>
+      <div class="btn-group">
+        <button class="btn btn-red" onclick="go('dvt_yes')"><div class="blbl">Yes \u2014 DVT signs present<span class="bsub">Urgent escalation required</span></div><span class="bchev">\u203a</span></button>
+        <button class="btn btn-outline" onclick="go('chem_check')"><div class="blbl">No \u2014 No DVT signs<span class="bsub">Proceed to chemical / thrombotic assessment</span></div><span class="bchev">\u203a</span></button>
+      </div>
+    </div>`},
+
+  dvt_yes:{progress:100,render:()=>`
+    <div class="card card-red card-body">
+      <span class="oico">&#x1F6A8;</span>
+      <div class="otitle">DVT Suspected \u2014 Escalate Urgently</div>
+      <div class="ib r"><strong>Notify Medical Staff Immediately</strong>Signs consistent with DVT or venous thrombosis. Do not use CVAD until reviewed.</div>
+      <div class="obody"><ul><li>Investigations: Doppler ultrasound or venography as directed</li><li>Management per haematology / medical team</li><li>Document all findings and actions</li></ul></div>
+    </div>
+    ${rstrt()}`},
+
+  chem_check:{progress:60,render:()=>`
+    <div class="card card-blue card-body">
+      <div class="sir"><div class="si si-p">&#x1F48A;</div><div><div class="st">Step 3 \u2014 Chemical or Thrombotic?</div><div class="ss">Identify likely occlusion type</div></div></div>
+      <div class="cl"><div class="cl-hdr">Signs of Chemical Occlusion</div>${chk(['Visible medication precipitation in catheter','Recent administration of medication, lipid, or viscous solutions','Sudden onset of resistance after medication administration'])}</div>
+      <div class="ib b"><strong>Clinical Practice Point</strong>If not mechanical and no chemical evidence \u2014 treat as thrombotic. 58% of occlusions are thrombotic.</div>
+    </div>
+    <div class="card card-body">
+      <div class="question">What type of occlusion is suspected?</div>
+      <div class="btn-group">
+        <button class="btn btn-blue" onclick="go('chem_type')"><div class="blbl">Chemical \u2014 precipitation visible or suspected<span class="bsub">Proceed to pharmacist + chemical management</span></div><span class="bchev">\u203a</span></button>
+        <button class="btn btn-red" onclick="go('thromb')"><div class="blbl">Thrombotic \u2014 no chemical evidence<span class="bsub">Proceed to thrombolytic treatment</span></div><span class="bchev">\u203a</span></button>
+      </div>
+    </div>`},
+
+  chem_type:{progress:70,render:()=>`
+    <div class="card card-blue card-body">
+      <div class="sir"><div class="si si-p">&#x1F9EA;</div><div><div class="st">Chemical \u2014 Identify Precipitant</div><div class="ss">Treatment depends on pH of precipitating solution</div></div></div>
+      <div class="ib a"><strong>Seek Pharmacist Advice</strong>Check catheter material compatibility (e.g. ethanol and polyurethane are incompatible).</div>
+    </div>
+    <div class="card card-body">
+      <div class="question">What solution was infused?</div>
+      <div class="btn-group">
+        <button class="btn btn-blue" onclick="go('chem_acid')"><div class="blbl">Acid solution (pH &lt; 6)<span class="bsub">e.g. parenteral nutrition, amino acids, vancomycin</span></div><span class="bchev">\u203a</span></button>
+        <button class="btn btn-blue" onclick="go('chem_alk')"><div class="blbl">Alkaline solution (pH &gt; 7)<span class="bsub">e.g. heparin, ampicillin, acyclovir, imipenem</span></div><span class="bchev">\u203a</span></button>
+        <button class="btn btn-blue" onclick="go('chem_lipid')"><div class="blbl">Lipid solution<span class="bsub">e.g. TPN, lipid emulsion</span></div><span class="bchev">\u203a</span></button>
+      </div>
+    </div>`},
+
+  chem_acid:{progress:75,render:()=>`
+    <div class="card card-purple card-body">
+      <div class="sir"><div class="si si-p">&#x1F9EA;</div><div><div class="st">Chemical \u2014 Acid pH &lt; 6</div><div class="ss">Sodium Bicarbonate or Sodium Hydroxide</div></div></div>
+      <div class="dbox"><b>Agent</b>Sodium Bicarbonate or Sodium Hydroxide<b>Volume</b>Fill volume of CVAD only<b>Dwell Time</b>20\u201360 minutes<b>Label Lumen</b>Yes \u2014 label during dwell</div>
+      <div class="ib b"><strong>Technique</strong>Partial occlusion \u2192 inject via syringe. Complete occlusion \u2192 three-way tap technique (create negative pressure).</div>
+      <div class="ib a"><strong>Note</strong>May dwell overnight or up to 72 hours if clinically appropriate and as per prescribed order.</div>
+    </div>
+    <div class="card card-body">
+      <div class="question">After dwell \u2014 is patency restored?</div>
+      <div class="btn-group">
+        <button class="btn btn-green" onclick="go('restored')">Yes \u2014 IN1/AS1 \u2014 Patency restored <span class="bchev">\u203a</span></button>
+        <button class="btn btn-red" onclick="go('chem_d2')">No \u2014 Instil second dose <span class="bchev">\u203a</span></button>
+      </div>
+    </div>`},
+
+  chem_alk:{progress:75,render:()=>`
+    <div class="card card-purple card-body">
+      <div class="sir"><div class="si si-p">&#x1F9EA;</div><div><div class="st">Chemical \u2014 Alkaline pH &gt; 7</div><div class="ss">Hydrochloric Acid</div></div></div>
+      <div class="dbox"><b>Agent</b>Hydrochloric Acid (as per prescribed order)<b>Volume</b>Fill volume of CVAD only<b>Dwell Time</b>20\u201360 minutes<b>Label Lumen</b>Yes \u2014 label during dwell</div>
+      <div class="ib b"><strong>Technique</strong>Partial occlusion \u2192 inject via syringe. Complete occlusion \u2192 three-way tap technique (create negative pressure).</div>
+    </div>
+    <div class="card card-body">
+      <div class="question">After dwell \u2014 is patency restored?</div>
+      <div class="btn-group">
+        <button class="btn btn-green" onclick="go('restored')">Yes \u2014 IN1/AS1 \u2014 Patency restored <span class="bchev">\u203a</span></button>
+        <button class="btn btn-red" onclick="go('chem_d2')">No \u2014 Instil second dose <span class="bchev">\u203a</span></button>
+      </div>
+    </div>`},
+
+  chem_lipid:{progress:75,render:()=>`
+    <div class="card card-purple card-body">
+      <div class="sir"><div class="si si-p">&#x1F9EA;</div><div><div class="st">Chemical \u2014 Lipid Occlusion</div><div class="ss">70% Sterile Ethanol</div></div></div>
+      <div class="dbox"><b>Agent</b>70% Sterile Ethanol<b>Volume</b>Fill volume of CVAD only<b>Dwell Time</b>20\u201360 minutes<b>Label Lumen</b>Yes \u2014 label during dwell</div>
+      <div class="ib r"><strong>Compatibility Warning</strong>Ethanol and polyurethane catheters are incompatible. Confirm catheter material before instilling.</div>
+    </div>
+    <div class="card card-body">
+      <div class="question">After dwell \u2014 is patency restored?</div>
+      <div class="btn-group">
+        <button class="btn btn-green" onclick="go('restored')">Yes \u2014 IN1/AS1 \u2014 Patency restored <span class="bchev">\u203a</span></button>
+        <button class="btn btn-red" onclick="go('chem_d2')">No \u2014 Instil second dose <span class="bchev">\u203a</span></button>
+      </div>
+    </div>`},
+
+  chem_d2:{progress:82,render:()=>`
+    <div class="card card-amber card-body">
+      <div class="sir"><div class="si si-a">&#x1F9EA;</div><div><div class="st">Chemical \u2014 2nd Dose</div><div class="ss">As per prescribed order</div></div></div>
+      <div class="ib a"><strong>Repeat Same Agent</strong>Instil second dose of same agent as per prescribed order. Dwell time and volume as above.</div>
+      <div class="ib b"><strong>Document</strong>Initial findings, assessment, interventions, evaluation, and final actions.</div>
+    </div>
+    <div class="card card-body">
+      <div class="question">After second dose \u2014 is patency restored?</div>
+      <div class="btn-group">
+        <button class="btn btn-green" onclick="go('restored')">Yes \u2014 IN1/AS1 \u2014 Patency restored <span class="bchev">\u203a</span></button>
+        <button class="btn btn-red" onclick="go('esc_chem')">No \u2014 Still occluded after 2 doses <span class="bchev">\u203a</span></button>
+      </div>
+    </div>`},
+
+  esc_chem:{progress:100,render:()=>`
+    <div class="card card-red card-body">
+      <span class="oico">&#x1F6A8;</span>
+      <div class="otitle">Escalate \u2014 Chemical Unresolved</div>
+      <div class="ib r"><strong>Consult Expert CVAD Nurse &amp; Medical Staff</strong>Two doses of chemical treatment have not resolved the occlusion.</div>
+      <div class="obody"><ul>
+        <li><strong>Radiological assessment</strong> \u2014 CXR or flow studies</li>
+        <li><strong>Low dose thrombolytic infusion</strong> (e.g. 30 min \u2013 4 hrs) for unresolved partial occlusion</li>
+        <li><strong>Assess for thrombotic occlusion</strong> as a contributing factor</li>
+        <li><strong>Interventional radiology</strong> (e.g. fibrin sheath management)</li>
+        <li><strong>Potential CVAD removal or replacement</strong></li>
+        <li>Document all findings, interventions, and outcomes</li>
+      </ul></div>
+    </div>
+    ${rstrt()}`},
+
+  thromb:{progress:70,render:()=>`
+    <div class="card card-red card-body">
+      <div class="sir"><div class="si si-r">&#x1FA78;</div><div><div class="st">Thrombotic Occlusion</div><div class="ss">Thrombolytic treatment \u2014 Dose 1</div></div></div>
+      <div class="cl"><div class="cl-hdr">Confirm Signs of Thrombotic Occlusion</div>${chk(['Visible blood in catheter, needleless connector or IV line','Frequent, recurring infusion pump alarms','Resistance or inability to inject fluids','Sluggish flow of IV fluids','Inability to withdraw blood','Flashback but no frank blood return'])}</div>
+    </div>
+    <div class="card card-body">
+      <div class="eyebrow">Dose 1 \u2014 Thrombolytic</div>
+      <div class="dbox"><b>Agent</b>Alteplase (as per prescribed order)<b>Adult Dose</b>2 mg in 2 mL<b>Paediatric (&lt;30 kg)</b>110% of catheter volume<b>Dwell Time</b>30\u2013120 minutes<b>Label Lumen</b>Yes \u2014 label during dwell<b>Fibrin tail / sheath suspected?</b>Stop ALL infusions during thrombolytic dwell</div>
+      <div class="ib b"><strong>Technique</strong>Partial occlusion \u2192 inject via syringe. Complete occlusion \u2192 three-way tap technique (facilitated by negative pressure).</div>
+    </div>
+    <div class="card card-body">
+      <div class="question">After first dose dwell \u2014 is patency restored?</div>
+      <div class="btn-group">
+        <button class="btn btn-green" onclick="go('restored')">Yes \u2014 IN1/AS1 \u2014 Patency restored <span class="bchev">\u203a</span></button>
+        <button class="btn btn-red" onclick="go('thromb_d2')">No \u2014 Instil second dose <span class="bchev">\u203a</span></button>
+      </div>
+    </div>`},
+
+  thromb_d2:{progress:82,render:()=>`
+    <div class="card card-red card-body">
+      <div class="sir"><div class="si si-r">&#x1FA78;</div><div><div class="st">Thrombotic \u2014 2nd Dose</div><div class="ss">Alteplase as per prescribed order</div></div></div>
+      <div class="dbox"><b>Agent</b>Alteplase (as per prescribed order)<b>Dose</b>As per second-round prescribed order<b>Dwell Time</b>30\u2013120 minutes<b>Label Lumen</b>Yes</div>
+      <div class="ib a"><strong>Document</strong>Initial findings, assessment, interventions, evaluation, and final actions.</div>
+    </div>
+    <div class="card card-body">
+      <div class="question">After second dose \u2014 is patency restored?</div>
+      <div class="btn-group">
+        <button class="btn btn-green" onclick="go('restored')">Yes \u2014 IN1/AS1 \u2014 Patency restored <span class="bchev">\u203a</span></button>
+        <button class="btn btn-red" onclick="go('esc_thromb')">No \u2014 Still occluded after 2 doses <span class="bchev">\u203a</span></button>
+      </div>
+    </div>`},
+
+  esc_thromb:{progress:100,render:()=>`
+    <div class="card card-red card-body">
+      <span class="oico">&#x1F6A8;</span>
+      <div class="otitle">Escalate \u2014 Thrombotic Unresolved</div>
+      <div class="ib r"><strong>Consult Expert CVAD Nurse &amp; Medical Staff</strong>Two doses of thrombolytic have not restored patency.</div>
+      <div class="obody"><ul>
+        <li><strong>Radiological assessment</strong> \u2014 CXR or flow studies (kink, occlusion, fibrin sheath, catheter fracture)</li>
+        <li><strong>Assess for chemical occlusion</strong> as a contributing or primary cause</li>
+        <li><strong>Interventional radiology</strong> (e.g. fibrin sheath management)</li>
+        <li><strong>Potential CVAD removal or replacement</strong></li>
+        <li>Document all findings, interventions, and outcomes</li>
+      </ul></div>
+    </div>
+    ${rstrt()}`},
+
+  restored:{progress:100,render:()=>`
+    <div class="card card-green card-body">
+      <span class="oico">\u2705</span>
+      <div class="otitle">Patency Restored \u2014 Resume Use</div>
+      <div class="ib g"><strong>IN1 / AS1 Confirmed</strong>Easy injection and easy aspiration restored.</div>
+      <div class="obody"><ul>
+        <li><strong>Document</strong> initial findings, assessment, interventions, evaluation, and final actions</li>
+        <li>Flush CVAD with 0.9% NaCl before resuming therapy</li>
+        <li>Resume standard care and flush/lock protocol</li>
+        <li>Monitor for recurrence and identify contributing factors</li>
+      </ul></div>
+    </div>
+    ${rstrt()}`}
+};
+
+function chk(items){return items.map(i=>`<div class="ci"><span class="cdot"></span><span>${i}</span></div>`).join('')}
+function rstrt(){return`<button class="restart-btn" onclick="startOver()">\u27F3\u00a0 Start New Assessment</button><div class="disclaimer">Based on the <a href="https://www.cnsa.org.au/resource/patency-management-algorithm-for-central-venous-access-devices.html" target="_blank">CNSA Patency Management Algorithm for CVADs</a>. Always follow facility policies and seek medical advice as required.</div>`}
+
+function go(id){hist.push(id);render(id);window.scrollTo({top:0,behavior:'smooth'})}
+function goBack(){if(hist.length>1){hist.pop();render(hist[hist.length-1]);window.scrollTo({top:0,behavior:'smooth'})}}
+function startOver(){hist=['start'];render('start');window.scrollTo({top:0,behavior:'smooth'})}
+
+function render(id){
+  const sc=S[id];if(!sc)return;
+  document.getElementById('progressBar').style.width=(sc.progress||0)+'%';
+  const back=hist.length>1?`<button class="back-btn" onclick="goBack()">\u2039 Back</button>`:'';
+  document.getElementById('app').innerHTML=`<div class="screen">${back}${sc.render()}</div>`;
+}
+go('start');
+</script>
+</body>
+</html>
